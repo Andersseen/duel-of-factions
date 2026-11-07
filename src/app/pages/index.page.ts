@@ -1,17 +1,21 @@
-import { Component, ChangeDetectionStrategy, inject } from "@angular/core";
-import { GameStore } from "../game/game.store";
-import { CardComponent } from "../game/components/card.component";
-import { PortraitComponent } from "../game/components/portrait.component";
-import { DetailComponent } from "../game/components/detail.component";
-import { OverlayComponent } from "../game/components/overlay.component";
-import { MoveAnimateDirective, MoveHoverDirective, MoveLoopDirective, MoveTapDirective } from "angular-movement";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import {
   DraggableDirective,
   DropZoneDirective,
   QzDropInfo,
 } from "@quartz-headless/core";
-import { UiBadge } from "../shared/volt/badge";
-import { UiButton, UiNativeButton } from "../shared/volt/button";
+import {
+  MoveAnimateDirective,
+  MoveHoverDirective,
+  MoveLoopDirective,
+  MoveTapDirective,
+} from "angular-movement";
+import { CardComponent } from "../game/components/card.component";
+import { DetailComponent } from "../game/components/detail.component";
+import { OverlayComponent } from "../game/components/overlay.component";
+import { PortraitComponent } from "../game/components/portrait.component";
+import { GameStore } from "../game/game.store";
+import { VoltBadge, VoltNativeButton } from "@voltui/components";
 @Component({
   selector: "app-game",
   providers: [GameStore],
@@ -26,9 +30,8 @@ import { UiButton, UiNativeButton } from "../shared/volt/button";
     MoveLoopDirective,
     DraggableDirective,
     DropZoneDirective,
-    UiNativeButton,
-    UiButton,
-    UiBadge,
+    VoltNativeButton,
+    VoltBadge,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./game.html",

@@ -32,7 +32,7 @@ npm run preview   # Serve the production build locally
 - `src/app/game/audio.ts`: procedural Web Audio music and effects. Audio starts after user interaction; there are no separate music files.
 - `src/app/game/translations.ts` and `i18n.ts`: original translation catalogs and helpers.
 - `src/app/game/components/`: game card, portrait, details and overlay components.
-- `src/app/shared/volt/`: Volt UI button and badge atoms, adapted to the existing game palette.
+- `@voltui/components`: Volt UI button and badge components imported directly from the package.
 - `src/styles.css`: original visual design and responsive behavior, with Tailwind CSS v4 utilities and theme tokens for Volt UI atoms.
 - `public/assets/`: original illustration atlases, rendered as SVG crops.
 - `tests/`: game-rule simulations and controller integration coverage.
@@ -43,7 +43,7 @@ This is a client-rendered Analog application (`ssr: false`), matching the origin
 
 Settings and custom decks are stored in localStorage using the original `df-*` keys. An active match is in memory and resets on page reload. Difficulty changes apply to the next match. Mobile uses paginated hands; desktop shows all ten initial cards in two rows. Artwork and faction colors are unchanged. Quartz Headless handles drag-and-drop, modal behavior and toast notifications; Angular Movement handles screen, hover, tap and turn-indicator motion. Tailwind CSS v4 provides utility styling and design tokens without adding SCSS.
 
-Volt UI button and badge atoms are kept in `src/app/shared/volt/` and use the existing forest-and-gold palette. Quartz Headless supplies accessible dialog focus, dismissal, background isolation, drag-and-drop and toasts. Angular Movement handles screen entry and interaction motion, replacing the UI's hand-written transitions and keyframes. Tailwind CSS v4 is configured through PostCSS; the established game layout remains intact.
+Volt UI's native button directive and badge component are imported directly from `@voltui/components` and themed to the existing forest-and-gold palette. Quartz Headless supplies accessible dialog focus, dismissal, background isolation, drag-and-drop and toasts. Angular Movement handles screen entry and interaction motion, replacing the UI's hand-written transitions and keyframes. Tailwind CSS v4 is configured through PostCSS; the established game layout remains intact.
 
 Quartz Headless 0.16 currently declares Angular 21 peer dependencies while this app runs Angular 22. `.npmrc` keeps clean installs reproducible with that peer-range mismatch; the app type-checks and builds with the installed version, but Quartz's upstream Angular 22 support is not yet declared.
 

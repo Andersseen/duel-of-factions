@@ -17,7 +17,7 @@ import {
   ToastService,
 } from "@quartz-headless/primitives";
 import { MoveHoverDirective, MoveTapDirective } from "angular-movement";
-import { UiNativeButton } from "../../shared/volt/button";
+import { VoltNativeButton } from "@voltui/components";
 @Component({
   selector: "game-overlay",
   imports: [
@@ -26,7 +26,7 @@ import { UiNativeButton } from "../../shared/volt/button";
     SwitchDirective,
     MoveHoverDirective,
     MoveTapDirective,
-    UiNativeButton,
+    VoltNativeButton,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: ":host{display:contents}",

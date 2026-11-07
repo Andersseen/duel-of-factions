@@ -1,6 +1,6 @@
 <div id="app">
   <div class="game-controls">
-    <button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+    <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
       class="settings-button"
       (click)="act('settings')"
       [attr.aria-label]="c.t('settings')"
@@ -19,8 +19,8 @@
       </h1>
       <p>{{c.t('intro')}}</p>
       <div class="menu-actions">
-        <button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('new')">{{c.t('play')}} ↗</button
-        ><button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('settings')">
+        <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('new')">{{c.t('play')}} ↗</button
+        ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('settings')">
           {{c.t('settings')}}
         </button>
       </div>
@@ -53,7 +53,7 @@
     </div>
     @if(c.factionPages>1){
     <div class="faction-pagination">
-      <button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
         class="ghost small"
         (click)="act('factions-prev')"
         [disabled]="c.factionPage===0"
@@ -61,7 +61,7 @@
       >
         ←</button
       ><span>{{c.factionPage+1}} / {{c.factionPages}}</span
-      ><button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
         class="ghost small"
         (click)="act('factions-next')"
         [disabled]="c.factionPage===c.factionPages-1"
@@ -80,7 +80,7 @@
           <h3>{{c.t(f)}}</h3>
           <p>{{c.t(f+'Desc')}}</p>
           <div class="trait">{{c.t(f+'Trait')}}</div>
-          <button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('faction',{faction:f})">
+          <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('faction',{faction:f})">
             {{c.t('selectFaction')}} →
           </button>
         </div>
@@ -95,7 +95,7 @@
         <div class="eyebrow">{{c.t(c.faction)}}</div>
         <h2>{{c.t('build')}}</h2>
       </div>
-      <ui-button
+      <button voltButton
         variant="ghost"
         size="icon"
         class="ghost small info-button"
@@ -103,10 +103,10 @@
         [aria-label]="c.t('deckInfo')"
       >
         ?
-      </ui-button>
+      </button>
     </div>
     <div class="deck-navigation">
-      <button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost small" (click)="act('back-factions')">
+      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost small" (click)="act('back-factions')">
         ← {{c.t('backFactions')}}</button
       ><label class="compact-filter"
         ><span class="sr-only">{{c.t('filterCards')}}</span
@@ -120,7 +120,7 @@
     <div class="builder">
       <section>
         <div class="toolbar">
-          @for(f of c.filters;track f){<button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+          @for(f of c.filters;track f){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
             [class]="'small '+(c.filter===f?'active':'ghost')"
             (click)="act('filter',{filter:f})"
           >
@@ -138,14 +138,14 @@
               (mouseenter)="c.preview(card.id)"
             ></button>
             <div class="copy-controls">
-              <button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+              <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
                 (click)="act('remove',{id:card.id})"
                 [disabled]="!c.deck()[card.id]"
                 [attr.aria-label]="'− '+c.name(card)"
               >
                 −</button
               ><span>{{c.deck()[card.id]||0}} / {{card.max}}</span
-              ><button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+              ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
                 (click)="act('add',{id:card.id})"
                 [disabled]="(c.deck()[card.id]||0)>=card.max"
                 [attr.aria-label]="'+ '+c.name(card)"
@@ -158,7 +158,7 @@
         </div>
       </section>
       <aside class="deck-aside">
-        <button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="deck-leader" (click)="act('deck-help')">
+        <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="deck-leader" (click)="act('deck-help')">
           <span class="avatar" [gamePortrait]="c.E.LEADER_ART[c.faction]"></span
           ><span
             ><span class="eyebrow">{{c.t('leader')}}</span>
@@ -180,7 +180,7 @@
         </div>
         @if(!c.valid.valid){
         <p class="validity invalid">{{c.t('invalid')}}</p>
-        }<button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+        }<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
           class="primary"
           (click)="act('prepare')"
           [disabled]="!c.valid.valid"
@@ -200,7 +200,7 @@
         <div class="eyebrow">{{c.t(game.difficulty)}}</div>
         <h2>{{c.t('initialHand')}}</h2>
       </div>
-      <ui-button
+      <button voltButton
         variant="ghost"
         size="icon"
         class="ghost small info-button"
@@ -208,7 +208,7 @@
         [aria-label]="c.t('help')"
       >
         ?
-      </ui-button>
+      </button>
     </div>
     <div class="matchup">
       <div class="avatar" [gamePortrait]="c.E.LEADER_ART[c.faction]"></div>
@@ -235,7 +235,7 @@
     </div>
     @if(c.preparePages>1){
     <div class="prepare-pagination">
-      <button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
         class="ghost"
         (click)="act('prepare-prev')"
         [disabled]="c.preparePage===0"
@@ -243,7 +243,7 @@
       >
         ‹</button
       ><span>{{c.preparePage+1}} / {{c.preparePages}}</span
-      ><button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
         class="ghost"
         (click)="act('prepare-next')"
         [disabled]="c.preparePage===c.preparePages-1"
@@ -255,7 +255,7 @@
     }
     <div class="prepare-footer">
       <span>{{c.t('exchanges')}}: <b>{{2-c.swaps}} / 2</b></span
-      ><button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('begin')">
+      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('begin')">
         {{c.t('begin')}} →
       </button>
     </div>
@@ -276,9 +276,9 @@
           <span>▤ {{p.hand.length}}</span
           ><span>{{c.t('deck')}} {{p.deck.length}}</span>
         </div>
-        <button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost small" (click)="act('grave',{side:side})">
+        <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost small" (click)="act('grave',{side:side})">
           {{c.t('grave')}} · {{p.grave.length}}</button
-        >@if(!side){<button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+        >@if(!side){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
           class="small"
           (click)="act('leader')"
           [disabled]="!c.canPlay()||!c.E.leaderReady(game,0)"
@@ -391,7 +391,7 @@
         <span>{{c.t('hand')}} · {{game.players[0].hand.length}}</span
         >@if(c.handPages>1){
         <div class="hand-pagination">
-          <button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+          <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
             class="ghost small"
             (click)="act('hand-prev')"
             [disabled]="c.handPage===0"
@@ -399,7 +399,7 @@
           >
             ‹</button
           ><span>{{c.handPage+1}} / {{c.handPages}}</span
-          ><button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+          ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
             class="ghost small"
             (click)="act('hand-next')"
             [disabled]="c.handPage===c.handPages-1"
@@ -437,7 +437,7 @@
           <p>{{c.handHint}}</p>
         </div>
         <div class="dock-buttons">
-          @if(c.special){<button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+          @if(c.special){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
             class="primary play-effect"
             [moveLoop]="{boxShadow:['0 0 18px #d6b3642b','0 0 22px #d6b36455']}"
             moveLoopType="reverse"
@@ -445,19 +445,19 @@
             [disabled]="!c.canPlay()"
           >
             {{c.t('apply')}}</button
-          >}@if(c.selectedDefinition;as d){<button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+          >}@if(c.selectedDefinition;as d){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
             class="ghost inspect-selected"
             (click)="act('inspect',{id:d.id})"
             [attr.aria-label]="c.t('moreInfo')"
           >
             ⓘ</button
-          ><button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+          ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
             class="ghost cancel-action"
             (click)="act('cancel')"
             [attr.aria-label]="c.t('cancel')"
           >
             ×</button
-          >}<button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+          >}<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
             [class]="(c.special?'ghost':'primary')+' pass-button'"
             (click)="act('pass')"
             [disabled]="!c.canPlay()"
@@ -482,7 +482,7 @@
   </main>
   } } @case('result'){ @if(c.game;as game){
   <main class="result" [move]="'fade-up'">
-    <ui-badge variant="outline" class="badge">{{c.t('finished')}}</ui-badge>
+    <volt-badge variant="outline" class="badge">{{c.t('finished')}}</volt-badge>
     <h1>
       {{c.t(game.winner===null?'draw':game.winner===0?'victory':'defeat')}}
     </h1>
@@ -521,11 +521,11 @@
       </tbody>
     </table>
     <div class="modal-actions">
-      <button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('rematch')">
+      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('rematch')">
         {{c.t('rematch')}} ↻</button
-      ><button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('change-deck')">
+      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('change-deck')">
         {{c.t('changeDeck')}}</button
-      ><button uiButton [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('menu')">{{c.t('menu')}}</button>
+      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('menu')">{{c.t('menu')}}</button>
     </div>
   </main>
   } } }

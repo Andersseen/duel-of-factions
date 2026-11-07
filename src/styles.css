@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss/theme.css";
 @import "tailwindcss/utilities.css";
+@import "@voltui/components/themes.css";
 
 @theme inline {
   --color-primary: var(--gold);
@@ -41,6 +42,7 @@
 }
 body {
   margin: 0;
+  color: var(--ink);
   background:
     radial-gradient(ellipse at 50% 0%, #33413766, transparent 60%), #101b17;
   min-height: 100vh;
