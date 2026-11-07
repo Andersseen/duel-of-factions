@@ -1,11 +1,6 @@
-@if(c.modal||c.roundNotice||(c.screen==='battle'&&c.game?.pending?.side===0)){
-<div class="overlay">
-  <section
-    class="modal"
-    role="dialog"
-    aria-modal="true"
-    [attr.aria-label]="c.t('title')"
-  >
+<ng-template #dialogTemplate let-ref>
+  @if(c.modal||c.roundNotice||(c.screen==='battle'&&c.game?.pending?.side===0)){
+  <section class="modal">
     @switch(c.modal){ @case('settings'){
     <button
       class="ghost small close"
@@ -232,5 +227,5 @@
     </div>
     } } }
   </section>
-</div>
-}
+  }
+</ng-template>

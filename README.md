@@ -32,7 +32,7 @@ npm run preview   # Serve the production build locally
 - `src/app/game/audio.ts`: procedural Web Audio music and effects. Audio starts after user interaction; there are no separate music files.
 - `src/app/game/translations.ts` and `i18n.ts`: original translation catalogs and helpers.
 - `src/app/ui/`: card, portrait, details, modal and pointer-drag components/directive.
-- `src/styles.css`: original visual design and responsive behavior.
+- `src/styles.css`: original visual design and responsive behavior, with Tailwind CSS v4 utilities and theme tokens for Volt UI atoms.
 - `public/assets/`: original illustration atlases, rendered as SVG crops.
 - `tests/`: game-rule simulations and controller integration coverage.
 
@@ -42,7 +42,9 @@ This is a client-rendered Analog application (`ssr: false`), matching the origin
 
 Settings and custom decks are stored in localStorage using the original `df-*` keys. An active match is in memory and resets on page reload. Difficulty changes apply to the next match. Mobile uses paginated hands; desktop shows all ten initial cards in two rows. Artwork and faction colors are unchanged.
 
-The app does not integrate Volt UI, Strata or other external UI libraries. Those can be introduced separately without mixing them into this migration.
+Volt UI button and badge atoms are copied into `src/app/ui/` and styled against the existing forest-and-gold palette. Quartz Headless supplies dialog focus, dismissal, and background isolation behavior. Angular Movement handles screen entry motion. Tailwind CSS v4 is configured through PostCSS; the established game layout remains in plain CSS so the card and battlefield styling stay intact.
+
+Quartz Headless 0.16 currently declares Angular 21 peer dependencies while this app runs Angular 22. `.npmrc` keeps clean installs reproducible with that peer-range mismatch; the app type-checks and builds with the installed version, but Quartz's upstream Angular 22 support is not yet declared.
 
 ## Build and delivery
 

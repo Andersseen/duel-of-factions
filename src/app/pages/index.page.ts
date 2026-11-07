@@ -5,6 +5,9 @@ import { PortraitComponent } from "../ui/portrait.component";
 import { DetailComponent } from "../ui/detail.component";
 import { DragCardDirective } from "../ui/drag-card.directive";
 import { OverlayComponent } from "../ui/overlay.component";
+import { MoveAnimateDirective } from "angular-movement";
+import { UiButton } from "../ui/button";
+import { UiBadge } from "../ui/badge";
 @Component({
   selector: "app-game",
   providers: [GameStore],
@@ -14,6 +17,9 @@ import { OverlayComponent } from "../ui/overlay.component";
     DetailComponent,
     DragCardDirective,
     OverlayComponent,
+    MoveAnimateDirective,
+    UiButton,
+    UiBadge,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./game.html",

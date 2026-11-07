@@ -9,7 +9,7 @@
     </button>
   </div>
   @switch(c.screen){ @case('menu'){
-  <main class="menu">
+  <main class="menu" [move]="'fade-up'">
     <div class="menu-copy">
       <div class="eyebrow">{{c.t('solo')}}</div>
       <h1>
@@ -37,7 +37,7 @@
     </div>
   </main>
   } @case('faction'){
-  <main class="page faction-page">
+  <main class="page faction-page" [move]="'fade-up'">
     <div class="page-title">
       <div>
         <div class="eyebrow">{{c.t('factionStep')}}</div>
@@ -89,19 +89,21 @@
     </div>
   </main>
   } @case('deck'){
-  <main class="page deck-page">
+  <main class="page deck-page" [move]="'fade-up'">
     <div class="page-title">
       <div>
         <div class="eyebrow">{{c.t(c.faction)}}</div>
         <h2>{{c.t('build')}}</h2>
       </div>
-      <button
+      <ui-button
+        variant="ghost"
+        size="icon"
         class="ghost small info-button"
         (click)="act('deck-help')"
-        [attr.aria-label]="c.t('deckInfo')"
+        [aria-label]="c.t('deckInfo')"
       >
         ?
-      </button>
+      </ui-button>
     </div>
     <div class="deck-navigation">
       <button class="ghost small" (click)="act('back-factions')">
@@ -190,19 +192,21 @@
     </div>
   </main>
   } @case('prepare'){ @if(c.game;as game){
-  <main class="page mulligan">
+  <main class="page mulligan" [move]="'fade-up'">
     <div class="page-title">
       <div>
         <div class="eyebrow">{{c.t(game.difficulty)}}</div>
         <h2>{{c.t('initialHand')}}</h2>
       </div>
-      <button
+      <ui-button
+        variant="ghost"
+        size="icon"
         class="ghost small info-button"
         (click)="act('prepare-help')"
-        [attr.aria-label]="c.t('help')"
+        [aria-label]="c.t('help')"
       >
         ?
-      </button>
+      </ui-button>
     </div>
     <div class="matchup">
       <div class="avatar" [gamePortrait]="c.E.LEADER_ART[c.faction]"></div>
@@ -253,7 +257,7 @@
     </div>
   </main>
   } } @case('battle'){ @if(c.game;as game){
-  <main class="board-layout">
+  <main class="board-layout" [move]="'fade-up'">
     <aside class="side-column">
       @for(side of [1,0];track side){@let p=game.players[side];
       <section [class]="'combatant '+p.f+(side?' enemy':'')">
@@ -447,8 +451,8 @@
     </aside>
   </main>
   } } @case('result'){ @if(c.game;as game){
-  <main class="result">
-    <div class="badge">{{c.t('finished')}}</div>
+  <main class="result" [move]="'fade-up'">
+    <ui-badge variant="outline" class="badge">{{c.t('finished')}}</ui-badge>
     <h1>
       {{c.t(game.winner===null?'draw':game.winner===0?'victory':'defeat')}}
     </h1>

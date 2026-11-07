@@ -23,16 +23,24 @@
     "@angular/platform-browser": "22.2.5",
     "@angular/platform-server": "22.2.5",
     "@angular/router": "22.2.5",
-    "rxjs": "7.8.2"
+    "@quartz-headless/core": "^0.16.0",
+    "@quartz-headless/primitives": "^0.16.0",
+    "angular-movement": "^1.2.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "rxjs": "7.8.2",
+    "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
     "@analogjs/platform": "2.9.6",
     "@angular/build": "22.2.5",
     "@angular/compiler-cli": "22.2.5",
+    "@tailwindcss/postcss": "^4.3.5",
     "@types/jsdom": "^27.0.0",
     "@types/node": "24.10.0",
     "jsdom": "^27.4.0",
     "prettier": "3.6.2",
+    "tailwindcss": "^4.3.5",
     "tsx": "4.20.6",
     "typescript": "~6.0.2",
     "vite": "^7.3.0"

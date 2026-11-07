@@ -1,4 +1,27 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap");
+@import "tailwindcss/theme.css";
+@import "tailwindcss/utilities.css";
+
+@theme inline {
+  --color-primary: var(--gold);
+  --color-primary-foreground: #202b20;
+  --color-background: var(--panel);
+  --color-foreground: var(--ink);
+  --color-muted: var(--line);
+  --color-border: var(--line);
+  --color-accent: #3a4c38;
+  --color-accent-foreground: var(--ink);
+  --color-ring: var(--gold);
+  --color-destructive: var(--red);
+  --color-destructive-foreground: #202b20;
+  --color-success: var(--forest);
+  --color-success-foreground: #101b17;
+  --color-warning: var(--gold);
+  --color-warning-foreground: #202b20;
+  --color-info: #8db0b3;
+  --color-info-foreground: #101b17;
+}
+
 :root {
   --bg: #101b17;
   --panel: #1c2923;
@@ -864,16 +887,18 @@ h3 {
   margin-top: 12px;
   text-align: center;
 }
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: #08100cba;
-  backdrop-filter: blur(6px);
-  display: flex;
+[data-qz-dialog-wrapper] {
   align-items: center;
   justify-content: center;
-  z-index: 100;
-  padding: 20px;
+  padding: max(12px, env(safe-area-inset-top)) 14px;
+}
+.qz-game-dialog {
+  background: transparent;
+  padding: 0;
+}
+.qz-game-backdrop {
+  background: #08100cba;
+  backdrop-filter: blur(6px);
 }
 .modal {
   position: relative;
@@ -993,20 +1018,6 @@ h3 {
   50% {
     opacity: 0.45;
   }
-}
-@keyframes appear {
-  from {
-    opacity: 0;
-    transform: translateY(9px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-main,
-.game-card {
-  animation: appear 0.22s ease-out;
 }
 .empty-detail {
   height: 201px;
@@ -1743,10 +1754,6 @@ body {
 }
 .settings-rows + .notice {
   margin-top: 18px;
-}
-.overlay {
-  padding: max(12px, env(safe-area-inset-top)) 14px;
-  z-index: 100;
 }
 .modal {
   max-height: calc(100dvh - 28px);
