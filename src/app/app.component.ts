@@ -1,9 +1,10 @@
 import { Component, ChangeDetectionStrategy } from "@angular/core";
 import { RouterOutlet } from "@angular/router";
+import { ToastContainerComponent } from "@quartz-headless/primitives";
 @Component({
   selector: "app-root",
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ToastContainerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: "<router-outlet />",
+  template: "<router-outlet /><qz-toast-container />",
 })
 export class AppComponent {}

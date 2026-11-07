@@ -83,6 +83,11 @@ export const T: Record<string, string[]> = {
   ],
   start: ["Jugar", "Грати"],
   restore: ["Restaurar mazo recomendado", "Відновити рекомендовану колоду"],
+  restoreToast: [
+    "Mazo recomendado restaurado.",
+    "Рекомендовану колоду відновлено.",
+    "Recommended deck restored.",
+  ],
   preview: ["INSPECCIÓN DE CARTA", "ОГЛЯД КАРТИ"],
   inspect: [
     "Pasa el cursor o selecciona una carta para ver su habilidad.",

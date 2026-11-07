@@ -5,8 +5,8 @@ import {
   computed,
   inject,
 } from "@angular/core";
-import { GameStore } from "../game/game.store";
-import { CardDefinition, CardInstance } from "../game/models";
+import { GameStore } from "../game.store";
+import { CardDefinition, CardInstance } from "../models";
 import { PortraitComponent } from "./portrait.component";
 @Component({
   selector: "button[gameCard]",

@@ -53,15 +53,10 @@ button {
   border: 1px solid #5c6850;
   border-radius: 6px;
   padding: 11px 18px;
-  transition:
-    transform 0.15s,
-    background 0.15s,
-    border-color 0.15s;
 }
 button:hover:not(:disabled) {
   background: #3a4c38;
   border-color: var(--gold);
-  transform: translateY(-2px);
 }
 button:focus-visible {
   outline: 3px solid #f8ca77;
@@ -709,7 +704,6 @@ h3 {
   background: linear-gradient(90deg, #2e3b2a55, #3b44361f);
   border-radius: 5px;
   margin: 4px 0;
-  transition: background 0.2s;
 }
 .battle-row.enemy {
   background: linear-gradient(90deg, #5a38314a, #50382e15);
@@ -1010,14 +1004,6 @@ h3 {
   color: var(--gold);
   font-size: 11px;
   line-height: 1.6;
-}
-.pulse {
-  animation: pulse 1.5s infinite;
-}
-@keyframes pulse {
-  50% {
-    opacity: 0.45;
-  }
 }
 .empty-detail {
   height: 201px;
@@ -1465,14 +1451,6 @@ h3 {
     display: none;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *:before,
-  *:after {
-    animation: none !important;
-    transition: none !important;
-  }
-}
 .selected-description {
   display: none;
 }
@@ -1867,7 +1845,6 @@ body {
   aspect-ratio: 0.72;
   flex-shrink: 0;
   max-width: 65px;
-  animation-duration: 0.18s;
 }
 .row-cards .card-art {
   min-height: 0;
@@ -2027,21 +2004,19 @@ body {
 .effect-ready:focus-visible {
   outline: 2px solid var(--gold);
 }
-.drop-hover {
+[data-qz-drag-over] {
   outline: 3px solid #e8cd78 !important;
   outline-offset: -3px;
   background: #b7bd5f40 !important;
 }
-.drag-ghost {
-  position: fixed !important;
-  z-index: 1000;
-  pointer-events: none !important;
-  width: 90px !important;
-  height: 128px !important;
-  transform: translate(-50%, -80%) rotate(-6deg) !important;
-  opacity: 0.94;
-  box-shadow: 0 20px 40px #0008;
-  animation: none !important;
+.qz-draggable:not(.qz-disabled) {
+  cursor: grab;
+}
+.qz-draggable.qz-dragging {
+  opacity: 0.48;
+}
+.qz-drop-zone.qz-can-drop {
+  border-color: var(--gold);
 }
 .right-column {
   min-height: 0;
@@ -2884,31 +2859,72 @@ body {
     display: none;
   }
 }
-/* Keep the stage stable while a turn updates. */
-main {
-  animation: none !important;
+.qz-toast-portal {
+  position: fixed;
+  inset: 1rem;
+  z-index: 1200;
+  pointer-events: none;
 }
-.game-card {
-  animation: none;
+.qz-toast-container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: min(22rem, calc(100vw - 2rem));
 }
-.game-card:hover:not(:disabled) {
-  transition:
-    transform 0.15s,
-    border-color 0.15s,
-    box-shadow 0.15s;
+.qz-toast-container--top-right {
+  top: 0;
+  right: 0;
 }
-.battle-row.weathered {
-  transition:
-    background 0.35s,
-    border-color 0.35s;
+.qz-toast-container--top-left {
+  top: 0;
+  left: 0;
 }
-.play-effect {
-  animation: effect-glow 2s ease-in-out infinite;
+.qz-toast-container--bottom-right {
+  right: 0;
+  bottom: 0;
 }
-@keyframes effect-glow {
-  50% {
-    box-shadow: 0 0 22px #d6b36455;
-  }
+.qz-toast-container--bottom-left {
+  bottom: 0;
+  left: 0;
+}
+.qz-toast {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px #0008;
+  pointer-events: auto;
+}
+.qz-toast__content {
+  flex: 1;
+  font-size: 0.85rem;
+}
+.qz-toast__title {
+  margin-bottom: 0.25rem;
+  color: var(--gold);
+  font-weight: 700;
+}
+.qz-toast__close,
+.qz-toast__action {
+  padding: 0.2rem 0.45rem;
+  background: transparent;
+}
+.qz-toast__progress {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+}
+.qz-toast__progress-bar {
+  height: 100%;
+  background: var(--gold);
 }
 @media (max-width: 650px) {
   .combatant {

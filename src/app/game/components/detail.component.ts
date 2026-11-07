@@ -4,17 +4,22 @@ import {
   input,
   inject,
 } from "@angular/core";
-import { GameStore } from "../game/game.store";
+import { GameStore } from "../game.store";
 import { CardComponent } from "./card.component";
+import { MoveHoverDirective, MoveTapDirective } from "angular-movement";
 @Component({
   selector: "game-detail",
-  imports: [CardComponent],
+  imports: [CardComponent, MoveHoverDirective, MoveTapDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: ":host{display:contents}",
   template: ` @if (id(); as id) {
       @if (c.E.cards[id]; as d) {
         @if (large()) {
-          <button [gameCard]="d"></button>
+          <button
+            [gameCard]="d"
+            [moveWhileHover]="'lift'"
+            [moveWhileTap]="'press'"
+          ></button>
         }
         <div class="eyebrow">{{ c.ab(d)[c.lang] }}</div>
         <h3>{{ c.name(d) }}</h3>

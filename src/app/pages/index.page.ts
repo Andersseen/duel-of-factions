@@ -1,13 +1,17 @@
 import { Component, ChangeDetectionStrategy, inject } from "@angular/core";
 import { GameStore } from "../game/game.store";
-import { CardComponent } from "../ui/card.component";
-import { PortraitComponent } from "../ui/portrait.component";
-import { DetailComponent } from "../ui/detail.component";
-import { DragCardDirective } from "../ui/drag-card.directive";
-import { OverlayComponent } from "../ui/overlay.component";
-import { MoveAnimateDirective } from "angular-movement";
-import { UiButton } from "../ui/button";
-import { UiBadge } from "../ui/badge";
+import { CardComponent } from "../game/components/card.component";
+import { PortraitComponent } from "../game/components/portrait.component";
+import { DetailComponent } from "../game/components/detail.component";
+import { OverlayComponent } from "../game/components/overlay.component";
+import { MoveAnimateDirective, MoveHoverDirective, MoveLoopDirective, MoveTapDirective } from "angular-movement";
+import {
+  DraggableDirective,
+  DropZoneDirective,
+  QzDropInfo,
+} from "@quartz-headless/core";
+import { UiBadge } from "../shared/volt/badge";
+import { UiButton, UiNativeButton } from "../shared/volt/button";
 @Component({
   selector: "app-game",
   providers: [GameStore],
@@ -15,9 +19,14 @@ import { UiBadge } from "../ui/badge";
     CardComponent,
     PortraitComponent,
     DetailComponent,
-    DragCardDirective,
     OverlayComponent,
     MoveAnimateDirective,
+    MoveHoverDirective,
+    MoveTapDirective,
+    MoveLoopDirective,
+    DraggableDirective,
+    DropZoneDirective,
+    UiNativeButton,
     UiButton,
     UiBadge,
   ],
@@ -48,5 +57,12 @@ export default class GamePage {
   }
   select(event: Event) {
     this.c.setFilter((event.target as HTMLSelectElement).value);
+  }
+  dragStart(uid: number) {
+    this.c.selectDrag(uid);
+  }
+  drop(info: QzDropInfo, row?: number, target?: number) {
+    info.event.stopPropagation();
+    this.c.drop(row, target);
   }
 }

@@ -4,10 +4,12 @@ import {
   computed,
   input,
   booleanAttribute,
-} from "@angular/core";
-import { cn } from "../utils";
-import { forwardAttributesFromHost } from "../host-forwarding";
-import { buttonVariants, type ButtonVariants } from "./variants";
+} from '@angular/core';
+import { cn } from '../utils';
+import { NgpButton } from 'ng-primitives/button';
+import { forwardAttributesFromHost } from '../host-forwarding';
+import { buttonVariants, type ButtonVariants } from './variants';
+import { MoveHoverDirective, MoveTapDirective } from 'angular-movement';
 
 /** An ARIA state value: booleans become `"true"` / `"false"`, `null`/`undefined` omit the attribute. */
 type AriaValue = string | boolean | null | undefined;
@@ -16,13 +18,13 @@ const toAriaString = (value: AriaValue): string | null =>
   value === null || value === undefined ? null : String(value);
 
 const FORWARDED_ARIA = [
-  "aria-label",
-  "aria-labelledby",
-  "aria-describedby",
-  "aria-expanded",
-  "aria-pressed",
-  "aria-controls",
-  "aria-haspopup",
+  'aria-label',
+  'aria-labelledby',
+  'aria-describedby',
+  'aria-expanded',
+  'aria-pressed',
+  'aria-controls',
+  'aria-haspopup',
 ];
 
 /**
@@ -40,9 +42,13 @@ const FORWARDED_ARIA = [
  * the host, where layout utilities such as `ml-auto` keep working.
  */
 @Component({
-  selector: "ui-button",
+  selector: 'ui-button',
+  imports: [NgpButton, MoveHoverDirective, MoveTapDirective],
   template: `
     <button
+      ngpButton
+      [moveWhileHover]="'lift'"
+      [moveWhileTap]="'press'"
       [type]="type()"
       [disabled]="disabled()"
       [class]="classes()"
@@ -64,38 +70,32 @@ const FORWARDED_ARIA = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UiButton {
-  readonly variant = input<ButtonVariants["variant"]>("solid");
-  readonly size = input<ButtonVariants["size"]>("md");
-  readonly type = input<"button" | "submit" | "reset">("button");
-  readonly disabled = input<boolean, unknown>(false, {
-    transform: booleanAttribute,
-  });
-  readonly class = input<string>("");
+  readonly variant = input<ButtonVariants['variant']>('solid');
+  readonly size = input<ButtonVariants['size']>('md');
+  readonly type = input<'button' | 'submit' | 'reset'>('button');
+  readonly disabled = input<boolean, unknown>(false, { transform: booleanAttribute });
+  readonly class = input<string>('');
   /** @deprecated Use `class` — both are merged into the native button. Kept for 1.x. */
-  readonly customClass = input<string>("");
+  readonly customClass = input<string>('');
 
-  readonly ariaLabel = input<string | null | undefined>(undefined, {
-    alias: "aria-label",
-  });
+  readonly ariaLabel = input<string | null | undefined>(undefined, { alias: 'aria-label' });
   readonly ariaLabelledby = input<string | null | undefined>(undefined, {
-    alias: "aria-labelledby",
+    alias: 'aria-labelledby',
   });
   readonly ariaDescribedby = input<string | null | undefined>(undefined, {
-    alias: "aria-describedby",
+    alias: 'aria-describedby',
   });
   readonly ariaExpanded = input<string | null, AriaValue>(null, {
-    alias: "aria-expanded",
+    alias: 'aria-expanded',
     transform: toAriaString,
   });
   readonly ariaPressed = input<string | null, AriaValue>(null, {
-    alias: "aria-pressed",
+    alias: 'aria-pressed',
     transform: toAriaString,
   });
-  readonly ariaControls = input<string | null | undefined>(undefined, {
-    alias: "aria-controls",
-  });
+  readonly ariaControls = input<string | null | undefined>(undefined, { alias: 'aria-controls' });
   readonly ariaHaspopup = input<string | null, AriaValue>(null, {
-    alias: "aria-haspopup",
+    alias: 'aria-haspopup',
     transform: toAriaString,
   });
 
@@ -103,8 +103,8 @@ export class UiButton {
     cn(
       buttonVariants({ variant: this.variant(), size: this.size() }),
       this.class(),
-      this.customClass(),
-    ),
+      this.customClass()
+    )
   );
 
   constructor() {

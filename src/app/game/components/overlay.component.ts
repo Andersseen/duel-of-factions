@@ -7,13 +7,27 @@ import {
   viewChild,
   ViewContainerRef,
 } from "@angular/core";
-import { GameStore } from "../game/game.store";
+import { GameStore } from "../game.store";
 import { CardComponent } from "./card.component";
 import { DetailComponent } from "./detail.component";
-import { DialogRef, DialogService } from "@quartz-headless/primitives";
+import {
+  DialogRef,
+  DialogService,
+  SwitchDirective,
+  ToastService,
+} from "@quartz-headless/primitives";
+import { MoveHoverDirective, MoveTapDirective } from "angular-movement";
+import { UiNativeButton } from "../../shared/volt/button";
 @Component({
   selector: "game-overlay",
-  imports: [CardComponent, DetailComponent],
+  imports: [
+    CardComponent,
+    DetailComponent,
+    SwitchDirective,
+    MoveHoverDirective,
+    MoveTapDirective,
+    UiNativeButton,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: ":host{display:contents}",
   templateUrl: "./overlay.html",
@@ -21,6 +35,7 @@ import { DialogRef, DialogService } from "@quartz-headless/primitives";
 export class OverlayComponent {
   readonly c = inject(GameStore).controller;
   private readonly dialogs = inject(DialogService);
+  private readonly toasts = inject(ToastService);
   private readonly viewContainer = inject(ViewContainerRef);
   private readonly dialogTemplate =
     viewChild.required<TemplateRef<unknown>>("dialogTemplate");
@@ -62,6 +77,12 @@ export class OverlayComponent {
       action,
       Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])),
     );
+    if (action === "restore") {
+      this.toasts.success(this.c.t("restoreToast"), this.c.t("deckInfo"), {
+        duration: 2800,
+        position: "top-right",
+      });
+    }
   }
   volume(event: Event) {
     this.c.setVolume((event.target as HTMLInputElement).value);
