@@ -1,0 +1,236 @@
+@if(c.modal||c.roundNotice||(c.screen==='battle'&&c.game?.pending?.side===0)){
+<div class="overlay">
+  <section
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="c.t('title')"
+  >
+    @switch(c.modal){ @case('settings'){
+    <button
+      class="ghost small close"
+      (click)="act('close')"
+      [attr.aria-label]="c.t('close')"
+    >
+      ×
+    </button>
+    <div class="eyebrow">{{c.t('title')}}</div>
+    <h2>{{c.t('settings')}}</h2>
+    <div class="settings-rows">
+      <fieldset class="difficulty-picker">
+        <legend>{{c.t('difficulty')}}</legend>
+        <div>
+          @for(d of c.E.DIFFICULTIES;track d){<button
+            [class]="'small '+(c.difficulty===d?'active':'ghost')"
+            (click)="act('difficulty',{level:d})"
+            [attr.aria-pressed]="c.difficulty===d"
+          >
+            {{c.t(d)}}</button
+          >}
+        </div>
+        <p>{{c.t('difficultyHint')}}</p>
+      </fieldset>
+      @if(c.screen==='battle'||c.screen==='prepare'){
+      <p class="notice">{{c.t('nextDifficulty')}}</p>
+      }
+      <div class="setting-row">
+        <span>{{c.t('language')}}</span>
+        <div class="language-options">
+          @for(label of ['Español','Українська','English'];track $index){<button
+            [class]="c.lang===$index?'primary':'ghost'"
+            (click)="act('lang',{lang:$index})"
+            [attr.aria-pressed]="c.lang===$index"
+          >
+            {{label}}</button
+          >}
+        </div>
+      </div>
+      <div class="setting-row">
+        <span>{{c.t('music')}}</span
+        ><button
+          role="switch"
+          [attr.aria-checked]="c.soundSettings.music"
+          (click)="act('music')"
+        >
+          {{c.t(c.soundSettings.music?'on':'off')}}
+        </button>
+      </div>
+      <div class="setting-row">
+        <span>{{c.t('effects')}}</span
+        ><button
+          role="switch"
+          [attr.aria-checked]="c.soundSettings.effects"
+          (click)="act('effects')"
+        >
+          {{c.t(c.soundSettings.effects?'on':'off')}}
+        </button>
+      </div>
+      <label class="setting-row"
+        ><span>{{c.t('volume')}}</span
+        ><input
+          type="range"
+          min="0"
+          max="100"
+          [value]="c.soundSettings.volume*100"
+          (input)="volume($event)"
+          [attr.aria-label]="c.t('volume')"
+      /></label>
+      <div class="setting-row">
+        <button class="ghost" (click)="act('help')">{{c.t('help')}}</button
+        ><button class="ghost" (click)="act('audio-test')">
+          {{c.t('audioTest')}}
+        </button>
+      </div>
+      @if(c.fullscreenEnabled){<button
+        class="ghost"
+        (click)="act('fullscreen')"
+      >
+        {{c.t(c.fullscreen?'exitFullscreen':'fullscreen')}}</button
+      >}
+    </div>
+    <p class="notice">{{c.t('settingsHint')}}</p>
+    <div class="modal-actions">
+      <button class="primary" (click)="act('close')">{{c.t('resume')}}</button
+      >@if(c.screen!=='menu'){<button class="ghost" (click)="act('menu')">
+        {{c.t('menu')}}</button
+      >}
+    </div>
+    } @case('deck-help'){
+    <button
+      class="ghost small close"
+      (click)="act('close')"
+      [attr.aria-label]="c.t('close')"
+    >
+      ×
+    </button>
+    <h2>{{c.t('deckInfo')}}</h2>
+    <p>{{c.t('deckGuide')}}</p>
+    <p>{{c.t('unitMin')}} · {{c.t('specialMax')}}</p>
+    <h3>{{c.t(c.faction+'Leader')}}</h3>
+    <p>{{c.t(c.faction+'LeaderDesc')}}</p>
+    <div class="modal-actions">
+      <button class="ghost" (click)="act('restore')">{{c.t('restore')}}</button
+      ><button class="primary" (click)="act('close')">{{c.t('close')}}</button>
+    </div>
+    } @case('prepare-help'){
+    <button
+      class="ghost small close"
+      (click)="act('close')"
+      [attr.aria-label]="c.t('close')"
+    >
+      ×
+    </button>
+    <h2>{{c.t('initialHand')}}</h2>
+    <p>{{c.t('prepareSub')}}</p>
+    <p>{{c.t('swapAgain')}}</p>
+    } @case('help'){
+    <button
+      class="ghost small close"
+      (click)="act('close')"
+      [attr.aria-label]="c.t('close')"
+    >
+      ×
+    </button>
+    <div class="eyebrow">{{c.t('title')}}</div>
+    <h2>{{c.t('help')}}</h2>
+    <div class="rules-grid">
+      @for(i of [1,2,3,4];track i){
+      <div class="rule">
+        <strong>0{{i}} · {{c.t('rules'+i)}}</strong>{{c.t('rules'+i+'b')}}
+      </div>
+      }
+    </div>
+    <p class="notice">{{c.t('rulesNote')}}</p>
+    } @case('quit'){
+    <h2>{{c.t('quitTitle')}}</h2>
+    <p>{{c.t('quitBody')}}</p>
+    <div class="modal-actions">
+      <button class="ghost" (click)="act('close')">{{c.t('stay')}}</button
+      ><button class="primary" (click)="act('quit')">{{c.t('menu')}}</button>
+    </div>
+    } @case('pass'){
+    <h2>{{c.t('confirmPass')}}</h2>
+    <p>{{c.t('confirmPassBody')}}</p>
+    <div class="modal-actions">
+      <button class="ghost" (click)="act('close')">
+        {{c.t('cancelButton')}}</button
+      ><button class="primary" (click)="act('confirm-pass')">
+        {{c.t('pass')}}
+      </button>
+    </div>
+    } @default{ @if(c.inspectId;as id){<button
+      class="ghost small close"
+      (click)="act('close')"
+      [attr.aria-label]="c.t('close')"
+    >
+      ×
+    </button>
+    <div class="detail" style="max-width: 260px; margin: auto">
+      <game-detail [id]="id" [large]="true" />
+    </div>
+    @if(c.swapUid!==undefined){
+    <div class="modal-actions">
+      <button
+        class="primary"
+        (click)="act('swap',{uid:c.swapUid!})"
+        [disabled]="c.swaps>=2||c.swapped.has(c.swapUid!)"
+      >
+        {{c.t('exchangeCard')}}</button
+      ><button class="ghost" (click)="act('close')">
+        {{c.t('cancelButton')}}
+      </button>
+    </div>
+    }} @else if(c.graveSide!==undefined){<button
+      class="ghost small close"
+      (click)="act('close')"
+      [attr.aria-label]="c.t('close')"
+    >
+      ×
+    </button>
+    <h2>{{c.t('grave')}} · {{c.t(c.graveSide?'rival':'you')}}</h2>
+    <div class="grave-grid">
+      @for(card of c.game!.players[c.graveSide!].grave;track card.uid){<button
+        [gameCard]="card"
+        (click)="act('inspect',{id:card.id})"
+      ></button
+      >}@empty{
+      <p>{{c.t('emptyGrave')}}</p>
+      }
+    </div>
+    } @else if(c.roundNotice;as score){
+    <div class="round-banner">
+      <div class="eyebrow">{{c.t('roundEnd')}}</div>
+      <h2>
+        {{c.t(score[0]===score[1]?'tieRound':score[0]>score[1]?'wonRound':'lostRound')}}
+      </h2>
+      <div class="res-score">{{score[0]}} : {{score[1]}}</div>
+      <p>{{c.t(score[0]===score[1]?'tieExplain':'nextExplain')}}</p>
+      @if(score[0]===score[1]){
+      <p>{{c.t('nextExplain')}}</p>
+      }
+      <div class="modal-actions">
+        <button class="primary" (click)="act('next-round')">
+          {{c.t(c.game!.over?'finished':'continue')}} →
+        </button>
+      </div>
+    </div>
+    } @else if(c.game?.pending?.side===0){
+    <div class="eyebrow">{{c.t('revive')}}</div>
+    <h2>{{c.t('revive')}}</h2>
+    <p>{{c.t('reviveSub')}}</p>
+    <div class="grave-grid" style="margin-top: 20px">
+      @for(card of c.E.eligible(c.game!.players[0]);track card.uid){<button
+        [gameCard]="card"
+        (click)="act('revive',{uid:card.uid})"
+      ></button
+      >}
+    </div>
+    <div class="modal-actions">
+      <button class="ghost" (click)="act('skip-revive')">
+        {{c.t('skip')}}
+      </button>
+    </div>
+    } } }
+  </section>
+</div>
+}

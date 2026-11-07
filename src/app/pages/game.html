@@ -1,0 +1,499 @@
+<div id="app">
+  <div class="game-controls">
+    <button
+      class="settings-button"
+      (click)="act('settings')"
+      [attr.aria-label]="c.t('settings')"
+    >
+      ⚙
+    </button>
+  </div>
+  @switch(c.screen){ @case('menu'){
+  <main class="menu">
+    <div class="menu-copy">
+      <div class="eyebrow">{{c.t('solo')}}</div>
+      <h1>
+        {{['Duelo de','Двобій','Duel of'][c.lang]}}<br /><em
+          >{{['Facciones.','фракцій.','Factions.'][c.lang]}}</em
+        >
+      </h1>
+      <p>{{c.t('intro')}}</p>
+      <div class="menu-actions">
+        <button class="primary" (click)="act('new')">{{c.t('play')}} ↗</button
+        ><button class="ghost" (click)="act('settings')">
+          {{c.t('settings')}}
+        </button>
+      </div>
+      <div class="menu-notes">{{c.t('local')}}</div>
+    </div>
+    <div class="menu-art">
+      @for(f of ['forest','granite'];track f){
+      <div class="hero-card">
+        <div [gamePortrait]="c.E.LEADER_ART[f]"></div>
+        <div class="hero-caption">{{c.t(f)}}</div>
+      </div>
+      }
+      <div class="vs-seal">VS</div>
+    </div>
+  </main>
+  } @case('faction'){
+  <main class="page faction-page">
+    <div class="page-title">
+      <div>
+        <div class="eyebrow">{{c.t('factionStep')}}</div>
+        <h2>{{c.t('choose')}}</h2>
+        <p>{{c.t('chooseSub')}}</p>
+      </div>
+      <div class="steps">
+        @for(step of ['faction','deck','duel'];track step){<span
+          [class.active]="step==='faction'"
+          >{{c.t(step+'Step')}}</span
+        >}
+      </div>
+    </div>
+    @if(c.factionPages>1){
+    <div class="faction-pagination">
+      <button
+        class="ghost small"
+        (click)="act('factions-prev')"
+        [disabled]="c.factionPage===0"
+        [attr.aria-label]="c.t('previousFactions')"
+      >
+        ←</button
+      ><span>{{c.factionPage+1}} / {{c.factionPages}}</span
+      ><button
+        class="ghost small"
+        (click)="act('factions-next')"
+        [disabled]="c.factionPage===c.factionPages-1"
+        [attr.aria-label]="c.t('nextFactions')"
+      >
+        →
+      </button>
+    </div>
+    }
+    <div class="faction-grid" [attr.data-count]="c.factions.length">
+      @for(f of c.factions;track f){
+      <article [class]="'faction-panel '+f">
+        <div [gamePortrait]="c.E.LEADER_ART[f]" [contain]="true"></div>
+        <div class="faction-info">
+          <div class="eyebrow">{{c.emblems[f]}} {{c.t(f+'Leader')}}</div>
+          <h3>{{c.t(f)}}</h3>
+          <p>{{c.t(f+'Desc')}}</p>
+          <div class="trait">{{c.t(f+'Trait')}}</div>
+          <button class="primary" (click)="act('faction',{faction:f})">
+            {{c.t('selectFaction')}} →
+          </button>
+        </div>
+      </article>
+      }
+    </div>
+  </main>
+  } @case('deck'){
+  <main class="page deck-page">
+    <div class="page-title">
+      <div>
+        <div class="eyebrow">{{c.t(c.faction)}}</div>
+        <h2>{{c.t('build')}}</h2>
+      </div>
+      <button
+        class="ghost small info-button"
+        (click)="act('deck-help')"
+        [attr.aria-label]="c.t('deckInfo')"
+      >
+        ?
+      </button>
+    </div>
+    <div class="deck-navigation">
+      <button class="ghost small" (click)="act('back-factions')">
+        ← {{c.t('backFactions')}}</button
+      ><label class="compact-filter"
+        ><span class="sr-only">{{c.t('filterCards')}}</span
+        ><select [value]="c.filter" (change)="select($event)">
+          @for(f of c.filters;track f){
+          <option [value]="f">{{c.t(f)}}</option>
+          }
+        </select></label
+      >
+    </div>
+    <div class="builder">
+      <section>
+        <div class="toolbar">
+          @for(f of c.filters;track f){<button
+            [class]="'small '+(c.filter===f?'active':'ghost')"
+            (click)="act('filter',{filter:f})"
+          >
+            {{c.t(f)}}</button
+          >}
+        </div>
+        <div class="card-grid">
+          @for(card of c.collection;track card.id){
+          <div class="card-wrap">
+            <button
+              [gameCard]="card"
+              (click)="act('inspect',{id:card.id})"
+              (mouseenter)="c.preview(card.id)"
+            ></button>
+            <div class="copy-controls">
+              <button
+                (click)="act('remove',{id:card.id})"
+                [disabled]="!c.deck()[card.id]"
+                [attr.aria-label]="'− '+c.name(card)"
+              >
+                −</button
+              ><span>{{c.deck()[card.id]||0}} / {{card.max}}</span
+              ><button
+                (click)="act('add',{id:card.id})"
+                [disabled]="(c.deck()[card.id]||0)>=card.max"
+                [attr.aria-label]="'+ '+c.name(card)"
+              >
+                +
+              </button>
+            </div>
+          </div>
+          }
+        </div>
+      </section>
+      <aside class="deck-aside">
+        <button class="deck-leader" (click)="act('deck-help')">
+          <span class="avatar" [gamePortrait]="c.E.LEADER_ART[c.faction]"></span
+          ><span
+            ><span class="eyebrow">{{c.t('leader')}}</span>
+            <h3>{{c.t(c.faction+'Leader')}}</h3></span
+          >
+        </button>
+        <div class="stats">
+          <div class="stat">
+            <strong>{{c.valid.units+c.valid.special}}</strong
+            ><small>{{c.t('cards')}}</small>
+          </div>
+          <div class="stat">
+            <strong>{{c.valid.units}}</strong><small>{{c.t('units')}}</small>
+          </div>
+          <div class="stat">
+            <strong>{{c.valid.special}}</strong
+            ><small>{{c.t('special')}}</small>
+          </div>
+        </div>
+        @if(!c.valid.valid){
+        <p class="validity invalid">{{c.t('invalid')}}</p>
+        }<button
+          class="primary"
+          (click)="act('prepare')"
+          [disabled]="!c.valid.valid"
+        >
+          {{c.t('start')}} →
+        </button>
+        <div class="preview-small">
+          @if(c.hover){<game-detail [id]="c.hover" />}
+        </div>
+      </aside>
+    </div>
+  </main>
+  } @case('prepare'){ @if(c.game;as game){
+  <main class="page mulligan">
+    <div class="page-title">
+      <div>
+        <div class="eyebrow">{{c.t(game.difficulty)}}</div>
+        <h2>{{c.t('initialHand')}}</h2>
+      </div>
+      <button
+        class="ghost small info-button"
+        (click)="act('prepare-help')"
+        [attr.aria-label]="c.t('help')"
+      >
+        ?
+      </button>
+    </div>
+    <div class="matchup">
+      <div class="avatar" [gamePortrait]="c.E.LEADER_ART[c.faction]"></div>
+      <span>{{c.t(c.faction)}} <b>vs</b> {{c.t(game.players[1].f)}}</span>
+      <div
+        class="avatar"
+        [gamePortrait]="c.E.LEADER_ART[game.players[1].f]"
+      ></div>
+    </div>
+    <div class="starting-hand" [style.--shown]="c.startingHand.length">
+      @for(card of c.startingHand;track card.uid){
+      <div [class.swap-used]="c.swapped.has(card.uid)">
+        <button
+          [gameCard]="card"
+          (click)="act('swap-preview',{uid:card.uid})"
+        ></button
+        >@if(c.swapped.has(card.uid)){
+        <div class="swap-mark">↻ {{c.t('changed')}}</div>
+        }
+      </div>
+      }
+    </div>
+    @if(c.preparePages>1){
+    <div class="prepare-pagination">
+      <button
+        class="ghost"
+        (click)="act('prepare-prev')"
+        [disabled]="c.preparePage===0"
+        [attr.aria-label]="c.t('previousCards')"
+      >
+        ‹</button
+      ><span>{{c.preparePage+1}} / {{c.preparePages}}</span
+      ><button
+        class="ghost"
+        (click)="act('prepare-next')"
+        [disabled]="c.preparePage===c.preparePages-1"
+        [attr.aria-label]="c.t('nextCards')"
+      >
+        ›
+      </button>
+    </div>
+    }
+    <div class="prepare-footer">
+      <span>{{c.t('exchanges')}}: <b>{{2-c.swaps}} / 2</b></span
+      ><button class="primary" (click)="act('begin')">
+        {{c.t('begin')}} →
+      </button>
+    </div>
+  </main>
+  } } @case('battle'){ @if(c.game;as game){
+  <main class="board-layout">
+    <aside class="side-column">
+      @for(side of [1,0];track side){@let p=game.players[side];
+      <section [class]="'combatant '+p.f+(side?' enemy':'')">
+        <div class="avatar" [gamePortrait]="c.E.LEADER_ART[p.f]"></div>
+        <small>{{c.t(side?'rival':'you')}}</small>
+        <h3>{{c.t(p.f)}}</h3>
+        <div class="gems" [attr.aria-label]="p.wins+' '+c.t('roundsWon')">
+          {{'◆'.repeat(p.wins)}}{{'◇'.repeat(p.wins>=2?0:2-p.wins)}}
+        </div>
+        <div class="total">{{c.E.total(game,side)}}</div>
+        <div class="count-line">
+          <span>▤ {{p.hand.length}}</span
+          ><span>{{c.t('deck')}} {{p.deck.length}}</span>
+        </div>
+        <button class="ghost small" (click)="act('grave',{side:side})">
+          {{c.t('grave')}} · {{p.grave.length}}</button
+        >@if(!side){<button
+          class="small"
+          (click)="act('leader')"
+          [disabled]="!c.canPlay()||!c.E.leaderReady(game,0)"
+        >
+          {{c.t(p.leader?'used':'leaderUse')}}</button
+        >}@if(p.passed){
+        <div class="passed">{{c.t('passed')}}</div>
+        }
+      </section>
+      @if(side===1){
+      <div
+        class="weather-panel"
+        [class.effect-ready]="c.special&&c.canPlay()"
+        (click)="c.special&&c.canPlay()?act('play-special'):null"
+        (keydown.enter)="c.special&&c.canPlay()?act('play-special'):null"
+        [attr.role]="c.special?'button':null"
+        [attr.tabindex]="c.special?0:null"
+      >
+        <div class="eyebrow">{{c.t('weather')}}</div>
+        <div class="weather-icons">
+          @for(w of game.weather;track w.card.uid){<span
+            [title]="c.name(w.card)"
+            >{{c.symbols[c.E.def(w.card).ability]}}</span
+          >}@empty{☀}
+        </div>
+        <span class="muted"
+          >@for(w of game.weather;track w.card.uid){{{c.name(w.card)}} }@empty{
+          {{c.t('noWeather')}} }</span
+        >
+      </div>
+      }}
+    </aside>
+    <section class="board-center">
+      <div class="battle-status">
+        <span>{{c.t('round')}} {{game.round}} / 3</span
+        ><span class="turn-indicator" [class.pulse]="game.turn===1"
+          ><i class="turn-dot"></i
+          >{{c.t(game.turn===0?'yourTurn':'thinking')}}</span
+        >
+      </div>
+      <div class="battlefield" [class.special-aim]="c.special">
+        @for(side of [1,0];track side){@for(row of (side?[2,1,0]:[0,1,2]);track
+        row){@let p=game.players[side];
+        <div
+          [class]="'battle-row '+p.f+(side?' enemy':'')"
+          [class.valid]="c.rowValid(side,row)"
+          [class.weathered]="weathered(row)"
+          [attr.data-row]="row"
+          [attr.role]="c.rowValid(side,row)?'button':null"
+          [attr.tabindex]="c.rowValid(side,row)?0:null"
+          [attr.aria-label]="c.t(c.E.ROWS[row])"
+          (click)="c.rowValid(side,row)?act('row',{row:row}):null"
+          (keydown.enter)="c.rowValid(side,row)?act('row',{row:row}):null"
+        >
+          <div class="row-label" [title]="c.t(c.E.ROWS[row])">
+            {{c.rowIcon[c.E.ROWS[row]]}}<small>{{c.t(c.E.ROWS[row])}}</small>@if(p.horn[row]){<span
+              class="horn-slot"
+              >⚑</span
+            >}
+          </div>
+          <div class="row-cards">
+            @for(card of p.rows[row];track card.uid){<button
+              [gameCard]="card"
+              [power]="c.E.strength(game,side,row,card)"
+              [target]="c.decoyTarget(side,card)"
+              [attr.data-row]="row"
+              [attr.data-uid]="card.uid"
+              (mouseenter)="c.preview(card.id)"
+              (click)="boardCard($event,side,row,card.uid,card.id)"
+            ></button
+            >}@empty{<span class="row-empty"
+              >{{c.rowValid(side,row)?'＋':c.t('emptyRow')}}</span
+            >}
+          </div>
+          <div class="row-score">{{c.E.scores(game,side)[row]}}</div>
+        </div>
+        } @if(side===1){
+        <div
+          class="midline"
+          [class.effect-ready]="c.special&&c.canPlay()"
+          (click)="c.special&&c.canPlay()?act('play-special'):null"
+          (keydown.enter)="c.special&&c.canPlay()?act('play-special'):null"
+          [attr.role]="c.special?'button':null"
+          [attr.tabindex]="c.special?0:null"
+        >
+          {{c.special?c.t('apply')+' ·
+          '+c.name(c.selectedDefinition!):c.t('title')}}
+        </div>
+        }}
+      </div>
+      <div class="hand-header">
+        <span>{{c.t('hand')}} · {{game.players[0].hand.length}}</span
+        >@if(c.handPages>1){
+        <div class="hand-pagination">
+          <button
+            class="ghost small"
+            (click)="act('hand-prev')"
+            [disabled]="c.handPage===0"
+            [attr.aria-label]="c.t('previousCards')"
+          >
+            ‹</button
+          ><span>{{c.handPage+1}} / {{c.handPages}}</span
+          ><button
+            class="ghost small"
+            (click)="act('hand-next')"
+            [disabled]="c.handPage===c.handPages-1"
+            [attr.aria-label]="c.t('nextCards')"
+          >
+            ›
+          </button>
+        </div>
+        }
+      </div>
+      <div class="hand" [class.turn-lock]="game.turn===1">
+        @for(card of c.hand;track card.uid){<button
+          [gameCard]="card"
+          [active]="c.selected===card.uid"
+          [dragCard]="card.uid"
+          (click)="act('hand',{uid:card.uid})"
+          (mouseenter)="c.preview(card.id)"
+        ></button
+        >}@empty{
+        <div class="hint">{{c.t('noCards')}}</div>
+        }
+      </div>
+      <div class="action-dock">
+        <div class="action-copy">
+          <strong
+            >{{c.selectedDefinition?c.name(c.selectedDefinition)+' ·
+            '+c.ab(c.selectedDefinition)[c.lang]:c.t(game.turn===0?'yourTurn':'thinking')}}</strong
+          >
+          <p>{{c.handHint}}</p>
+        </div>
+        <div class="dock-buttons">
+          @if(c.special){<button
+            class="primary play-effect"
+            (click)="act('play-special')"
+            [disabled]="!c.canPlay()"
+          >
+            {{c.t('apply')}}</button
+          >}@if(c.selectedDefinition;as d){<button
+            class="ghost inspect-selected"
+            (click)="act('inspect',{id:d.id})"
+            [attr.aria-label]="c.t('moreInfo')"
+          >
+            ⓘ</button
+          ><button
+            class="ghost cancel-action"
+            (click)="act('cancel')"
+            [attr.aria-label]="c.t('cancel')"
+          >
+            ×</button
+          >}<button
+            [class]="(c.special?'ghost':'primary')+' pass-button'"
+            (click)="act('pass')"
+            [disabled]="!c.canPlay()"
+          >
+            {{c.t('pass')}} →
+          </button>
+        </div>
+      </div>
+    </section>
+    <aside class="right-column">
+      <div class="detail">
+        <div class="eyebrow">{{c.t('preview')}}</div>
+        <game-detail [id]="c.hover||c.selectedDefinition?.id" [large]="true" />
+      </div>
+      <div class="log">
+        <div class="eyebrow">{{c.t('events')}}</div>
+        @for(e of game.log.slice(0,4);track $index){
+        <div class="log-entry">{{c.logText(e)}}</div>
+        }
+      </div>
+    </aside>
+  </main>
+  } } @case('result'){ @if(c.game;as game){
+  <main class="result">
+    <div class="badge">{{c.t('finished')}}</div>
+    <h1>
+      {{c.t(game.winner===null?'draw':game.winner===0?'victory':'defeat')}}
+    </h1>
+    <p class="muted">
+      {{c.t(game.winner===null?'drawSub':game.winner===0?'victorySub':'defeatSub')}}
+    </p>
+    <div class="matchup">
+      <div class="avatar" [gamePortrait]="c.E.LEADER_ART[c.faction]"></div>
+      <div>
+        <div class="eyebrow">{{c.t('roundsWon')}}</div>
+        <div class="res-score">
+          {{game.players[0].wins}} : {{game.players[1].wins}}
+        </div>
+      </div>
+      <div
+        class="avatar"
+        [gamePortrait]="c.E.LEADER_ART[game.players[1].f]"
+      ></div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>{{c.t('round')}}</th>
+          <th>{{c.t(c.faction)}} · {{c.t('you')}}</th>
+          <th>{{c.t(game.players[1].f)}} · {{c.t('rival')}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(score of game.history;track $index){
+        <tr>
+          <td>0{{$index+1}}</td>
+          <td [class.winner]="score[0]>=score[1]">{{score[0]}}</td>
+          <td [class.winner]="score[1]>=score[0]">{{score[1]}}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    <div class="modal-actions">
+      <button class="primary" (click)="act('rematch')">
+        {{c.t('rematch')}} ↻</button
+      ><button class="ghost" (click)="act('change-deck')">
+        {{c.t('changeDeck')}}</button
+      ><button class="ghost" (click)="act('menu')">{{c.t('menu')}}</button>
+    </div>
+  </main>
+  } } }
+  <game-overlay />
+</div>
