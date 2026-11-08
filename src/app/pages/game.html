@@ -19,7 +19,7 @@
       </h1>
       <p>{{c.t('intro')}}</p>
       <div class="menu-actions">
-        <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('new')">{{c.t('play')}} ↗</button
+        <button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('new')">{{c.t('play')}} ↗</button
         ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('settings')">
           {{c.t('settings')}}
         </button>
@@ -57,6 +57,7 @@
         class="ghost small"
         (click)="act('factions-prev')"
         [disabled]="c.factionPage===0"
+        [moveDisabled]="c.factionPage===0"
         [attr.aria-label]="c.t('previousFactions')"
       >
         ←</button
@@ -65,6 +66,7 @@
         class="ghost small"
         (click)="act('factions-next')"
         [disabled]="c.factionPage===c.factionPages-1"
+        [moveDisabled]="c.factionPage===c.factionPages-1"
         [attr.aria-label]="c.t('nextFactions')"
       >
         →
@@ -80,7 +82,7 @@
           <h3>{{c.t(f)}}</h3>
           <p>{{c.t(f+'Desc')}}</p>
           <div class="trait">{{c.t(f+'Trait')}}</div>
-          <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('faction',{faction:f})">
+          <button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('faction',{faction:f})">
             {{c.t('selectFaction')}} →
           </button>
         </div>
@@ -136,6 +138,7 @@
         class="ghost"
         (click)="act('prepare-prev')"
         [disabled]="c.preparePage===0"
+        [moveDisabled]="c.preparePage===0"
         [attr.aria-label]="c.t('previousCards')"
       >
         ‹</button
@@ -144,6 +147,7 @@
         class="ghost"
         (click)="act('prepare-next')"
         [disabled]="c.preparePage===c.preparePages-1"
+        [moveDisabled]="c.preparePage===c.preparePages-1"
         [attr.aria-label]="c.t('nextCards')"
       >
         ›
@@ -152,7 +156,7 @@
     }
     <div class="prepare-footer">
       <span>{{c.t('exchanges')}}: <b>{{2-c.swaps}} / 2</b></span
-      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('begin')">
+      ><button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('begin')">
         {{c.t('begin')}} →
       </button>
     </div>
@@ -200,7 +204,7 @@
       </tbody>
     </table>
     <div class="modal-actions">
-      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('rematch')">
+      <button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('rematch')">
         {{c.t('rematch')}} ↻</button
       ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('change-deck')">
         {{c.t('changeDeck')}}</button

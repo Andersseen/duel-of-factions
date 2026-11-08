@@ -65,12 +65,16 @@ try {
   c.action("begin");
   assert.equal(c.screen, "battle");
   const unit = c.hand.find((card) => c.E.def(card).unit)!;
-  c.action("hand", { uid: String(unit.uid) });
+  assert.equal(c.selectDrag(-1), false);
+  assert.equal(c.selected, null);
+  assert.equal(c.selectDrag(unit.uid), true);
+  assert.equal(c.selected, unit.uid);
   const row = c.E.ROWS.indexOf(c.E.def(unit).row);
   const side = c.E.def(unit).ability === "spy" ? 1 : 0;
   assert(c.rowValid(side, row));
   c.drop(row);
   assert(c.game!.players[side].rows[row].some((card) => card.uid === unit.uid));
+  assert.equal(c.selectDrag(unit.uid), false);
   c.action("menu");
   assert.equal(c.modal, "quit");
   c.action("quit");

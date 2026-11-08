@@ -39,7 +39,9 @@ export class BattlefieldComponent {
   act(action: string, data: Record<string, string | number> = {}) {
     this.c.action(
       action,
-      Object.fromEntries(Object.entries(data).map(([key, value]) => [key, String(value)])),
+      Object.fromEntries(
+        Object.entries(data).map(([key, value]) => [key, String(value)]),
+      ),
     );
   }
 
@@ -63,8 +65,36 @@ export class BattlefieldComponent {
     this.c.selectDrag(uid);
   }
 
+  activateRow(event: Event, side: number, row: number) {
+    // A card's keyboard activation belongs to its native button, not the row.
+    if (event.target !== event.currentTarget || !this.c.rowValid(side, row))
+      return;
+    event.preventDefault();
+    this.act("row", { row });
+  }
+
+  activateSpecial(event: Event) {
+    if (
+      event.target !== event.currentTarget ||
+      !this.c.special ||
+      !this.c.canPlay()
+    )
+      return;
+    event.preventDefault();
+    this.act("play-special");
+  }
+
   drop(info: QzDropInfo, row?: number, target?: number) {
     info.event.stopPropagation();
-    this.c.drop(row, target);
+    const data = info.data;
+    if (
+      typeof data !== "object" ||
+      data === null ||
+      !("uid" in data) ||
+      typeof data.uid !== "number" ||
+      !this.c.game?.players[0].hand.some((card) => card.uid === data.uid)
+    )
+      return;
+    if (this.c.selectDrag(data.uid)) this.c.drop(row, target);
   }
 }

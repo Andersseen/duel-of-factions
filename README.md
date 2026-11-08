@@ -59,6 +59,15 @@ tests/                    Engine and controller tests
 
 The rules engine is kept independent of Angular. The page-level component provides the match store, while focused standalone components render the deck builder and battlefield. Angular signals drive view updates; Analog provides file-based routing and Vite handles development and builds.
 
+## UI library integration
+
+- Volt UI supplies native button variants, badges, and the mobile deck filter. The imported `sage-sharp` CSS preset matches `provideVoltTheme`; game color tokens and faction colors remain in `src/styles.css`.
+- Angular Movement handles screen and dialog entrances, hover/tap feedback, and turn indicators. It respects the system's reduced motion preference; the stylesheet applies that preference to Volt's CSS transitions too. Disabled actions also disable their movement directives.
+- Quartz Headless manages modal focus trapping, focus restoration, background isolation, audio switches, toasts, and card drag and drop. Round results and revival choices require an explicit game action; other dialogs support Escape and backdrop dismissal. Dialog names and switch labels follow the selected language.
+- Dragged cards are validated against the current hand. Click selection and Enter/Space on highlighted rows provide the keyboard alternative to dragging.
+
+Run `npm test` and `npm run build` after changing the integration. For browser checks, run `npm run preview` and verify settings (including keyboard focus and switches), deck filters, card exchange, card placement by click/keyboard/drag, and round continuation on desktop and mobile.
+
 ## Build and deploy
 
 ```sh

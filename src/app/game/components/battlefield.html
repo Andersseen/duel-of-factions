@@ -1,3 +1,4 @@
+@if(c.game; as game){
 <main class="board-layout" [move]="'fade-up'">
     <aside class="side-column">
       @for(side of [1,0];track side){@let p=game.players[side];
@@ -19,6 +20,7 @@
           class="small"
           (click)="act('leader')"
           [disabled]="!c.canPlay()||!c.E.leaderReady(game,0)"
+          [moveDisabled]="!c.canPlay()||!c.E.leaderReady(game,0)"
         >
           {{c.t(p.leader?'used':'leaderUse')}}</button
         >}@if(p.passed){
@@ -34,7 +36,8 @@
         [qzDropZoneDisabled]="!c.special||!c.canPlay()"
         (qzDrop)="drop($event)"
         (click)="c.special&&c.canPlay()?act('play-special'):null"
-        (keydown.enter)="c.special&&c.canPlay()?act('play-special'):null"
+        (keydown.enter)="activateSpecial($event)"
+        (keydown.space)="activateSpecial($event)"
         [attr.role]="c.special?'button':null"
         [attr.tabindex]="c.special?0:null"
       >
@@ -76,7 +79,8 @@
           [attr.tabindex]="c.rowValid(side,row)?0:null"
           [attr.aria-label]="c.t(c.E.ROWS[row])"
           (click)="c.rowValid(side,row)?act('row',{row:row}):null"
-          (keydown.enter)="c.rowValid(side,row)?act('row',{row:row}):null"
+          (keydown.enter)="activateRow($event,side,row)"
+          (keydown.space)="activateRow($event,side,row)"
         >
           <div class="row-label" [title]="c.t(c.E.ROWS[row])">
             {{c.rowIcon[c.E.ROWS[row]]}}<small>{{c.t(c.E.ROWS[row])}}</small>@if(p.horn[row]){<span
@@ -115,7 +119,8 @@
           [qzDropZoneDisabled]="!c.special||!c.canPlay()"
           (qzDrop)="drop($event)"
           (click)="c.special&&c.canPlay()?act('play-special'):null"
-          (keydown.enter)="c.special&&c.canPlay()?act('play-special'):null"
+          (keydown.enter)="activateSpecial($event)"
+          (keydown.space)="activateSpecial($event)"
           [attr.role]="c.special?'button':null"
           [attr.tabindex]="c.special?0:null"
         >
@@ -132,6 +137,7 @@
             class="ghost small"
             (click)="act('hand-prev')"
             [disabled]="c.handPage===0"
+            [moveDisabled]="c.handPage===0"
             [attr.aria-label]="c.t('previousCards')"
           >
             ‹</button
@@ -140,6 +146,7 @@
             class="ghost small"
             (click)="act('hand-next')"
             [disabled]="c.handPage===c.handPages-1"
+            [moveDisabled]="c.handPage===c.handPages-1"
             [attr.aria-label]="c.t('nextCards')"
           >
             ›
@@ -174,12 +181,13 @@
           <p>{{c.handHint}}</p>
         </div>
         <div class="dock-buttons">
-          @if(c.special){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+          @if(c.special){<button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
             class="primary play-effect"
             [moveLoop]="{boxShadow:['0 0 18px #d6b3642b','0 0 22px #d6b36455']}"
             moveLoopType="reverse"
             (click)="act('play-special')"
             [disabled]="!c.canPlay()"
+            [moveDisabled]="!c.canPlay()"
           >
             {{c.t('apply')}}</button
           >}@if(c.selectedDefinition;as d){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
@@ -194,10 +202,11 @@
             [attr.aria-label]="c.t('cancel')"
           >
             ×</button
-          >}<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+          >}<button voltButton [variant]="c.special?'ghost':'solid'" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
             [class]="(c.special?'ghost':'primary')+' pass-button'"
             (click)="act('pass')"
             [disabled]="!c.canPlay()"
+            [moveDisabled]="!c.canPlay()"
           >
             {{c.t('pass')}} →
           </button>
@@ -217,3 +226,4 @@
       </div>
     </aside>
   </main>
+}

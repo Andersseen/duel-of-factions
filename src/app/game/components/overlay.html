@@ -1,6 +1,7 @@
-<ng-template #dialogTemplate let-ref>
+<ng-template #dialogTemplate let-ref let-labelledBy="ariaLabelledBy">
   @if(c.modal||c.roundNotice||(c.screen==='battle'&&c.game?.pending?.side===0)){
-  <section class="modal">
+  <section class="modal" [move]="'fade-up'">
+    <h2 class="sr-only" [id]="labelledBy">{{dialogTitle()}}</h2>
     @switch(c.modal){ @case('settings'){
     <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
       class="ghost small close"
@@ -15,7 +16,7 @@
       <fieldset class="difficulty-picker">
         <legend>{{c.t('difficulty')}}</legend>
         <div>
-          @for(d of c.E.DIFFICULTIES;track d){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+          @for(d of c.E.DIFFICULTIES;track d){<button voltButton [variant]="c.difficulty===d?'solid':'ghost'" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
             [class]="'small '+(c.difficulty===d?'active':'ghost')"
             (click)="act('difficulty',{level:d})"
             [attr.aria-pressed]="c.difficulty===d"
@@ -31,7 +32,7 @@
       <div class="setting-row">
         <span>{{c.t('language')}}</span>
         <div class="language-options">
-          @for(label of ['Español','Українська','English'];track $index){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+          @for(label of ['Español','Українська','English'];track $index){<button voltButton [variant]="c.lang===$index?'solid':'ghost'" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
             [class]="c.lang===$index?'primary':'ghost'"
             (click)="act('lang',{lang:$index})"
             [attr.aria-pressed]="c.lang===$index"
@@ -44,6 +45,7 @@
         <span>{{c.t('music')}}</span
         ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
           qzSwitch
+          [attr.aria-label]="c.t('music')"
           [checked]="c.soundSettings.music"
           (checkedChange)="act('music')"
         >
@@ -54,6 +56,7 @@
         <span>{{c.t('effects')}}</span
         ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
           qzSwitch
+          [attr.aria-label]="c.t('effects')"
           [checked]="c.soundSettings.effects"
           (checkedChange)="act('effects')"
         >
@@ -85,7 +88,7 @@
     </div>
     <p class="notice">{{c.t('settingsHint')}}</p>
     <div class="modal-actions">
-      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('close')">{{c.t('resume')}}</button
+      <button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('close')">{{c.t('resume')}}</button
       >@if(c.screen!=='menu'){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('menu')">
         {{c.t('menu')}}</button
       >}
@@ -105,7 +108,7 @@
     <p>{{c.t(c.faction+'LeaderDesc')}}</p>
     <div class="modal-actions">
       <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('restore')">{{c.t('restore')}}</button
-      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('close')">{{c.t('close')}}</button>
+      ><button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('close')">{{c.t('close')}}</button>
     </div>
     } @case('prepare-help'){
     <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
@@ -141,7 +144,7 @@
     <p>{{c.t('quitBody')}}</p>
     <div class="modal-actions">
       <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('close')">{{c.t('stay')}}</button
-      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('quit')">{{c.t('menu')}}</button>
+      ><button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('quit')">{{c.t('menu')}}</button>
     </div>
     } @case('pass'){
     <h2>{{c.t('confirmPass')}}</h2>
@@ -149,7 +152,7 @@
     <div class="modal-actions">
       <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('close')">
         {{c.t('cancelButton')}}</button
-      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('confirm-pass')">
+      ><button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('confirm-pass')">
         {{c.t('pass')}}
       </button>
     </div>
@@ -165,10 +168,11 @@
     </div>
     @if(c.swapUid!==undefined){
     <div class="modal-actions">
-      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+      <button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
         class="primary"
         (click)="act('swap',{uid:c.swapUid!})"
         [disabled]="c.swaps>=2||c.swapped.has(c.swapUid!)"
+        [moveDisabled]="c.swaps>=2||c.swapped.has(c.swapUid!)"
       >
         {{c.t('exchangeCard')}}</button
       ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('close')">
@@ -206,7 +210,7 @@
       <p>{{c.t('nextExplain')}}</p>
       }
       <div class="modal-actions">
-        <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('next-round')">
+        <button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('next-round')">
           {{c.t(c.game!.over?'finished':'continue')}} →
         </button>
       </div>

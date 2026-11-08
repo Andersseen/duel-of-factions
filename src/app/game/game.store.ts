@@ -664,7 +664,8 @@ export function createGameController() {
       revision.update((n) => n + 1);
     },
     selectDrag(uid: number) {
-      if (!canPlay()) return false;
+      if (!canPlay() || !game?.players[0].hand.some((card) => card.uid === uid))
+        return false;
       selected = uid;
       hover = null;
       audio.unlock();

@@ -4,7 +4,7 @@ import {
   MoveHoverDirective,
   MoveTapDirective,
 } from "angular-movement";
-import { VoltNativeButton } from "@voltui/components";
+import { VoltNativeButton, VoltNativeSelect } from "@voltui/components";
 import { CardComponent } from "./card.component";
 import { DetailComponent } from "./detail.component";
 import { PortraitComponent } from "./portrait.component";
@@ -20,6 +20,7 @@ import { GameStore } from "../game.store";
     MoveHoverDirective,
     MoveTapDirective,
     VoltNativeButton,
+    VoltNativeSelect,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./deck-builder.html",
@@ -30,7 +31,9 @@ export class DeckBuilderComponent {
   act(action: string, data: Record<string, string | number> = {}) {
     this.c.action(
       action,
-      Object.fromEntries(Object.entries(data).map(([key, value]) => [key, String(value)])),
+      Object.fromEntries(
+        Object.entries(data).map(([key, value]) => [key, String(value)]),
+      ),
     );
   }
 

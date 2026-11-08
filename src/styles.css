@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss/theme.css";
 @import "tailwindcss/utilities.css";
-@import "@voltui/components/themes.css";
+@import "@voltui/components/themes/presets/sage-sharp.css";
 
 @theme inline {
   --color-primary: var(--gold);
@@ -891,6 +891,7 @@ h3 {
 .qz-game-dialog {
   background: transparent;
   padding: 0;
+  width: min(720px, 100%);
 }
 .qz-game-backdrop {
   background: #08100cba;
@@ -3886,4 +3887,16 @@ body[data-theme] {
 app-root,
 app-game {
   display: contents;
+}
+
+/* Movement handles its own reduced-motion policy; cover CSS feedback from Volt too. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0s !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
 }

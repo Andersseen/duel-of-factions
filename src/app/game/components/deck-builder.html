@@ -19,7 +19,7 @@
         ← {{c.t('backFactions')}}</button
       ><label class="compact-filter"
         ><span class="sr-only">{{c.t('filterCards')}}</span
-        ><select [value]="c.filter" (change)="select($event)">
+        ><select voltNativeSelect [value]="c.filter" (change)="select($event)">
           @for(f of c.filters;track f){
           <option [value]="f">{{c.t(f)}}</option>
           }
@@ -29,8 +29,9 @@
     <div class="builder">
       <section>
         <div class="toolbar">
-          @for(f of c.filters;track f){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+          @for(f of c.filters;track f){<button voltButton [variant]="c.filter===f?'solid':'ghost'" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
             [class]="'small '+(c.filter===f?'active':'ghost')"
+            [attr.aria-pressed]="c.filter===f"
             (click)="act('filter',{filter:f})"
           >
             {{c.t(f)}}</button
@@ -50,6 +51,7 @@
               <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
                 (click)="act('remove',{id:card.id})"
                 [disabled]="!c.deck()[card.id]"
+                [moveDisabled]="!c.deck()[card.id]"
                 [attr.aria-label]="'− '+c.name(card)"
               >
                 −</button
@@ -57,6 +59,7 @@
               ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
                 (click)="act('add',{id:card.id})"
                 [disabled]="(c.deck()[card.id]||0)>=card.max"
+                [moveDisabled]="(c.deck()[card.id]||0)>=card.max"
                 [attr.aria-label]="'+ '+c.name(card)"
               >
                 +
@@ -89,10 +92,11 @@
         </div>
         @if(!c.valid.valid){
         <p class="validity invalid">{{c.t('invalid')}}</p>
-        }<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+        }<button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
           class="primary"
           (click)="act('prepare')"
           [disabled]="!c.valid.valid"
+          [moveDisabled]="!c.valid.valid"
         >
           {{c.t('start')}} →
         </button>
