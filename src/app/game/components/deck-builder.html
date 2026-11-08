@@ -1,0 +1,104 @@
+<main class="page deck-page" [move]="'fade-up'">
+    <div class="page-title">
+      <div>
+        <div class="eyebrow">{{c.t(c.faction)}}</div>
+        <h2>{{c.t('build')}}</h2>
+      </div>
+      <button voltButton
+        variant="ghost"
+        size="icon"
+        class="ghost small info-button"
+        (click)="act('deck-help')"
+        [aria-label]="c.t('deckInfo')"
+      >
+        ?
+      </button>
+    </div>
+    <div class="deck-navigation">
+      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost small" (click)="act('back-factions')">
+        ← {{c.t('backFactions')}}</button
+      ><label class="compact-filter"
+        ><span class="sr-only">{{c.t('filterCards')}}</span
+        ><select [value]="c.filter" (change)="select($event)">
+          @for(f of c.filters;track f){
+          <option [value]="f">{{c.t(f)}}</option>
+          }
+        </select></label
+      >
+    </div>
+    <div class="builder">
+      <section>
+        <div class="toolbar">
+          @for(f of c.filters;track f){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+            [class]="'small '+(c.filter===f?'active':'ghost')"
+            (click)="act('filter',{filter:f})"
+          >
+            {{c.t(f)}}</button
+          >}
+        </div>
+        <div class="card-grid">
+          @for(card of c.collection;track card.id){
+          <div class="card-wrap">
+            <button
+              [gameCard]="card"
+              [moveWhileHover]="'lift'"
+              [moveWhileTap]="'press'"
+              (click)="act('inspect',{id:card.id})"
+              (mouseenter)="c.preview(card.id)"
+            ></button>
+            <div class="copy-controls">
+              <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+                (click)="act('remove',{id:card.id})"
+                [disabled]="!c.deck()[card.id]"
+                [attr.aria-label]="'− '+c.name(card)"
+              >
+                −</button
+              ><span>{{c.deck()[card.id]||0}} / {{card.max}}</span
+              ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+                (click)="act('add',{id:card.id})"
+                [disabled]="(c.deck()[card.id]||0)>=card.max"
+                [attr.aria-label]="'+ '+c.name(card)"
+              >
+                +
+              </button>
+            </div>
+          </div>
+          }
+        </div>
+      </section>
+      <aside class="deck-aside">
+        <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="deck-leader" (click)="act('deck-help')">
+          <span class="avatar" [gamePortrait]="c.E.LEADER_ART[c.faction]"></span
+          ><span
+            ><span class="eyebrow">{{c.t('leader')}}</span>
+            <h3>{{c.t(c.faction+'Leader')}}</h3></span
+          >
+        </button>
+        <div class="stats">
+          <div class="stat">
+            <strong>{{c.valid.units+c.valid.special}}</strong
+            ><small>{{c.t('cards')}}</small>
+          </div>
+          <div class="stat">
+            <strong>{{c.valid.units}}</strong><small>{{c.t('units')}}</small>
+          </div>
+          <div class="stat">
+            <strong>{{c.valid.special}}</strong
+            ><small>{{c.t('special')}}</small>
+          </div>
+        </div>
+        @if(!c.valid.valid){
+        <p class="validity invalid">{{c.t('invalid')}}</p>
+        }<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+          class="primary"
+          (click)="act('prepare')"
+          [disabled]="!c.valid.valid"
+        >
+          {{c.t('start')}} →
+        </button>
+        <div class="preview-small">
+          @if(c.hover){<game-detail [id]="c.hover" />}
+        </div>
+      </aside>
+    </div>
+  </main>

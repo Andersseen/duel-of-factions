@@ -1,17 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import {
-  DraggableDirective,
-  DropZoneDirective,
-  QzDropInfo,
-} from "@quartz-headless/core";
-import {
   MoveAnimateDirective,
   MoveHoverDirective,
-  MoveLoopDirective,
   MoveTapDirective,
 } from "angular-movement";
 import { CardComponent } from "../game/components/card.component";
-import { DetailComponent } from "../game/components/detail.component";
+import { BattlefieldComponent } from "../game/components/battlefield.component";
+import { DeckBuilderComponent } from "../game/components/deck-builder.component";
 import { OverlayComponent } from "../game/components/overlay.component";
 import { PortraitComponent } from "../game/components/portrait.component";
 import { GameStore } from "../game/game.store";
@@ -22,14 +17,12 @@ import { VoltBadge, VoltNativeButton } from "@voltui/components";
   imports: [
     CardComponent,
     PortraitComponent,
-    DetailComponent,
+    BattlefieldComponent,
+    DeckBuilderComponent,
     OverlayComponent,
     MoveAnimateDirective,
     MoveHoverDirective,
     MoveTapDirective,
-    MoveLoopDirective,
-    DraggableDirective,
-    DropZoneDirective,
     VoltNativeButton,
     VoltBadge,
   ],
@@ -43,29 +36,5 @@ export default class GamePage {
       action,
       Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])),
     );
-  }
-  weathered(row: number) {
-    return (
-      this.c.game?.weather.some(
-        (w) => this.c.E.def(w.card).ability === this.c.E.ROWS[row],
-      ) ?? false
-    );
-  }
-  boardCard(event: Event, side: number, row: number, uid: number, id: string) {
-    event.stopPropagation();
-    const card = { uid, id };
-    if (this.c.decoyTarget(side, card)) this.act("decoy-target", { uid });
-    else if (this.c.rowValid(side, row)) this.act("row", { row });
-    else this.act("board-inspect", { id });
-  }
-  select(event: Event) {
-    this.c.setFilter((event.target as HTMLSelectElement).value);
-  }
-  dragStart(uid: number) {
-    this.c.selectDrag(uid);
-  }
-  drop(info: QzDropInfo, row?: number, target?: number) {
-    info.event.stopPropagation();
-    this.c.drop(row, target);
   }
 }
