@@ -1,0 +1,233 @@
+/*
+ * The game dialog (OverlayComponent) on top of Volt's Dialog. Volt owns centering,
+ * focus trap, enter/exit animation and roles; this only sizes and themes the surface.
+ */
+.game-dialog-backdrop {
+  background: color-mix(in srgb, var(--bg) 75%, transparent);
+  backdrop-filter: blur(6px);
+}
+.modal {
+  width: min(680px, calc(100vw - 28px));
+  max-width: 680px;
+  max-height: calc(100dvh - 28px);
+  overflow: auto;
+  padding: 32px;
+  border-color: color-mix(in oklab, var(--gold) 45%, var(--line));
+  border-radius: 12px;
+  background: linear-gradient(var(--panel), var(--bg));
+  box-shadow: 0 30px 100px #0008;
+  scrollbar-width: thin;
+}
+.modal[data-kind="inspect"] {
+  width: min(360px, calc(100vw - 28px));
+}
+.modal[data-kind="quit"],
+.modal[data-kind="pass"],
+.modal[data-kind="round"],
+.modal[data-kind="prepare-help"] {
+  width: min(460px, calc(100vw - 28px));
+  text-align: center;
+}
+.dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border-radius: 999px;
+}
+.modal-body h2 {
+  margin: 6px 0 12px;
+  padding-right: 32px;
+}
+.modal[data-kind="quit"] h2,
+.modal[data-kind="pass"] h2,
+.modal[data-kind="round"] h2,
+.modal[data-kind="prepare-help"] h2 {
+  padding: 0;
+}
+.modal-body > p {
+  margin-bottom: 10px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #b9c2ae;
+}
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+/* Settings. */
+.settings-rows {
+  display: grid;
+  margin-top: 8px;
+}
+.setting-block {
+  display: grid;
+  gap: 8px;
+  padding: 0 0 16px;
+  border: 0;
+  border-bottom: 1px solid #69734e55;
+  min-width: 0;
+}
+.setting-block legend {
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--gold);
+}
+.setting-hint {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+.setting-note {
+  justify-self: start;
+  gap: 4px;
+}
+.option-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.option-group volt-radio-item {
+  white-space: nowrap;
+}
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #69734e55;
+  font-size: 13px;
+}
+.setting-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.setting-slider {
+  flex: 0 1 180px;
+}
+.setting-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 16px;
+}
+
+/* Deck help. */
+.leader-note {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-top: 8px;
+  padding: 14px;
+  background: color-mix(in oklab, var(--panel) 70%, black);
+}
+.leader-note h3 {
+  font-size: 21px;
+}
+.leader-note p {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+/* Rules. */
+.rules-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  list-style: none;
+}
+.rule {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--ink-muted);
+}
+.rule strong {
+  display: block;
+  margin-bottom: 5px;
+  font: 600 18px var(--font-display);
+  color: var(--gold);
+}
+.rules-note {
+  margin-top: 20px;
+}
+
+/* Inspect, graveyard, revive. */
+.detail-dialog {
+  padding: 16px;
+}
+.detail-dialog .detail-card {
+  height: min(36dvh, 250px);
+  max-width: none;
+}
+.grave-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.grave-empty {
+  grid-column: 1 / -1;
+}
+
+/* Round result. */
+.res-score {
+  margin: 12px;
+  font: 500 56px/1 var(--font-display);
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--gold);
+}
+
+@media (max-width: 700px) {
+  .modal {
+    padding: 26px 18px;
+  }
+  .modal-body h2 {
+    font-size: 30px;
+  }
+  .rules-grid {
+    grid-template-columns: 1fr;
+  }
+  .setting-row:has(.option-group) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .res-score {
+    font-size: 44px;
+  }
+}
+
+/* Landscape phones: card beside its description so the actions stay on screen. */
+@media (max-height: 500px) {
+  .modal {
+    padding: 18px 22px;
+  }
+  .modal[data-kind="inspect"] {
+    width: min(560px, calc(100vw - 28px));
+  }
+  .detail-dialog {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 16px;
+    align-items: start;
+  }
+  .detail-dialog .detail-card {
+    grid-row: span 5;
+    height: min(58dvh, 220px);
+    margin: 0;
+  }
+  .modal-actions {
+    margin-top: 12px;
+  }
+  .modal-body h2 {
+    font-size: 26px;
+    margin-bottom: 6px;
+  }
+}

@@ -1,0 +1,59 @@
+/* Match result. */
+.result {
+  height: 100dvh;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: safe center;
+  overflow: auto;
+  padding: 35px 25px 20px;
+  text-align: center;
+  scrollbar-width: thin;
+}
+.result-badge {
+  gap: 6px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.result h1 {
+  margin: 12px 0;
+  font-size: clamp(36px, 7vh, 65px);
+}
+.result[data-outcome="victory"] h1 {
+  color: var(--gold);
+}
+.result .matchup {
+  margin: 18px 0;
+  gap: 28px;
+}
+.result .avatar {
+  width: 70px;
+  height: 80px;
+}
+.result-table {
+  width: min(620px, 100%);
+  margin: 12px 0;
+}
+.result-table .winner {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .result {
+    padding: 42px 16px 16px;
+  }
+  .result .avatar {
+    width: 52px;
+    height: 60px;
+  }
+  .result .res-score {
+    font-size: 38px;
+  }
+  .result .modal-actions > button {
+    flex: 1 1 140px;
+  }
+}

@@ -1,229 +1,343 @@
-@if(c.game; as game){
-<main class="board-layout" [move]="'fade-up'">
-    <aside class="side-column">
-      @for(side of [1,0];track side){@let p=game.players[side];
-      <section [class]="'combatant '+p.f+(side?' enemy':'')">
-        <div class="avatar" [gamePortrait]="c.E.LEADER_ART[p.f]"></div>
-        <small>{{c.t(side?'rival':'you')}}</small>
-        <h3>{{c.t(p.f)}}</h3>
-        <div class="gems" [attr.aria-label]="p.wins+' '+c.t('roundsWon')">
-          {{'◆'.repeat(p.wins)}}{{'◇'.repeat(p.wins>=2?0:2-p.wins)}}
+@if (c.game; as game) {
+<main class="board-layout" move="fade-up">
+  <aside class="side-column">
+    @for (side of [1, 0]; track side) { @let p = game.players[side];
+    <volt-card
+      class="combatant"
+      [attr.data-faction]="p.f"
+      [class.enemy]="side === 1"
+    >
+      <div class="combatant-head">
+        <volt-avatar class="avatar"
+          ><span [gamePortrait]="c.E.LEADER_ART[p.f]"></span
+        ></volt-avatar>
+        <div class="combatant-name">
+          <small>{{ c.t(side ? "rival" : "you") }}</small>
+          <h3>{{ c.t(p.f) }}</h3>
         </div>
-        <div class="total">{{c.E.total(game,side)}}</div>
-        <div class="count-line">
-          <span>▤ {{p.hand.length}}</span
-          ><span>{{c.t('deck')}} {{p.deck.length}}</span>
-        </div>
-        <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost small" (click)="act('grave',{side:side})">
-          {{c.t('grave')}} · {{p.grave.length}}</button
-        >@if(!side){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-          class="small"
-          (click)="act('leader')"
-          [disabled]="!c.canPlay()||!c.E.leaderReady(game,0)"
-          [moveDisabled]="!c.canPlay()||!c.E.leaderReady(game,0)"
-        >
-          {{c.t(p.leader?'used':'leaderUse')}}</button
-        >}@if(p.passed){
-        <div class="passed">{{c.t('passed')}}</div>
-        }
-      </section>
-      @if(side===1){
+      </div>
       <div
-        class="weather-panel"
-        [class.effect-ready]="c.special&&c.canPlay()"
+        class="gems"
+        role="img"
+        [attr.aria-label]="p.wins + ' ' + c.t('roundsWon')"
+      >
+        @for (i of [0, 1]; track i) {
+        <lmn-star
+          [size]="16"
+          [variant]="i < p.wins ? 'filled' : 'outline'"
+          tone="primary"
+        />
+        }
+      </div>
+      @let total = c.E.total(game, side);
+      <div class="total" [gameBump]="total">{{ total }}</div>
+      <div class="count-line">
+        <span class="hand-count" [qzTooltip]="c.t('hand')"
+          ><lmn-rectangle-stack [size]="14" [ariaLabel]="c.t('hand')" /> {{
+          p.hand.length }}</span
+        >
+        <volt-badge variant="outline"
+          >{{ c.t("deck") }} {{ p.deck.length }}</volt-badge
+        >
+      </div>
+      <div class="combatant-actions">
+        <button
+          voltButton
+          size="sm"
+          variant="outline"
+          class="grave-button"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          (click)="act('grave', { side: side })"
+          [attr.aria-label]="c.t('grave') + ' · ' + p.grave.length"
+        >
+          <lmn-archive-box [size]="14" />
+          <span class="action-label"
+            >{{ c.t("grave") }} · {{ p.grave.length }}</span
+          >
+        </button>
+        @if (!side && !p.passed) {
+        <button
+          voltButton
+          size="sm"
+          variant="outline"
+          class="leader-button"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          (click)="act('leader')"
+          [disabled]="!c.canPlay() || !c.E.leaderReady(game, 0)"
+          [moveDisabled]="!c.canPlay() || !c.E.leaderReady(game, 0)"
+          [attr.aria-label]="c.t(p.leader ? 'used' : 'leaderUse')"
+        >
+          <lmn-sparkles [size]="14" />
+          <span class="action-label"
+            >{{ c.t(p.leader ? "used" : "leaderUse") }}</span
+          >
+        </button>
+        }
+      </div>
+      @if (p.passed) {
+      <volt-badge class="passed" variant="warning" move="zoom-in"
+        >{{ c.t("passed") }}</volt-badge
+      >
+      }
+    </volt-card>
+    @if (side === 1) {
+    <volt-card
+      class="weather-panel"
+      [class.effect-ready]="c.special && c.canPlay()"
+      qzDropZone
+      [qzDropZoneAccept]="['game-card']"
+      [qzDropZoneDisabled]="!c.special || !c.canPlay()"
+      (qzDrop)="drop($event)"
+      (click)="c.special && c.canPlay() ? act('play-special') : null"
+      (keydown.enter)="activateSpecial($event)"
+      (keydown.space)="activateSpecial($event)"
+      [attr.role]="c.special ? 'button' : null"
+      [attr.tabindex]="c.special ? 0 : null"
+    >
+      <div class="eyebrow">{{ c.t("weather") }}</div>
+      <div class="weather-icons">
+        @for (w of game.weather; track w.card.uid) {
+        <span
+          class="weather-chip"
+          move="zoom-in"
+          [qzTooltip]="c.name(w.card)"
+          role="img"
+          [attr.aria-label]="c.name(w.card)"
+          tabindex="0"
+          >{{ c.symbols[c.E.def(w.card).ability] }}</span
+        >
+        } @empty {
+        <lmn-sun [size]="20" />
+        <span class="weather-clear">{{ c.t("noWeather") }}</span>
+        }
+      </div>
+    </volt-card>
+    } }
+  </aside>
+
+  <section class="board-center">
+    <div class="battle-status">
+      <span>{{ c.t("round") }} {{ game.round }} / 3</span>
+      <span
+        class="turn-indicator"
+        role="status"
+        [class.waiting]="game.turn === 1"
+        [moveLoop]="game.turn === 1 ? 'pulse' : 'none'"
+        ><i class="turn-dot"></i>{{ c.t(game.turn === 0 ? "yourTurn" :
+        "thinking") }}</span
+      >
+    </div>
+    <div class="battlefield" [class.special-aim]="c.special">
+      @for (side of [1, 0]; track side) { @for (row of side ? [2, 1, 0] : [0, 1,
+      2]; track row) { @let p = game.players[side]; @let rowName =
+      c.t(c.E.ROWS[row]);
+      <div
+        class="battle-row"
+        [attr.data-faction]="p.f"
+        [class.enemy]="side === 1"
+        [class.valid]="c.rowValid(side, row)"
+        [class.weathered]="weathered(row)"
+        [attr.data-row]="row"
         qzDropZone
         [qzDropZoneAccept]="['game-card']"
-        [qzDropZoneDisabled]="!c.special||!c.canPlay()"
+        [qzDropZoneDisabled]="!c.rowValid(side, row)"
+        (qzDrop)="drop($event, row)"
+        [attr.role]="c.rowValid(side, row) ? 'button' : 'group'"
+        [attr.tabindex]="c.rowValid(side, row) ? 0 : null"
+        [attr.aria-label]="rowName"
+        (click)="c.rowValid(side, row) ? act('row', { row: row }) : null"
+        (keydown.enter)="activateRow($event, side, row)"
+        (keydown.space)="activateRow($event, side, row)"
+      >
+        <div class="row-label" [qzTooltip]="rowName">
+          <span aria-hidden="true">{{ c.rowIcon[c.E.ROWS[row]] }}</span
+          ><small>{{ rowName }}</small>
+          @if (p.horn[row]) {
+          <lmn-megaphone
+            class="horn-slot"
+            [size]="14"
+            [ariaLabel]="c.abilityName('horn')"
+            move="zoom-in"
+          />
+          }
+        </div>
+        <div class="row-cards">
+          @for (card of p.rows[row]; track card.uid) {
+          <button
+            [gameCard]="card"
+            move="zoom-in"
+            moveWhileHover="lift"
+            moveWhileTap="press"
+            [power]="c.E.strength(game, side, row, card)"
+            [target]="c.decoyTarget(side, card)"
+            [attr.data-row]="row"
+            [attr.data-uid]="card.uid"
+            qzDropZone
+            [qzDropZoneAccept]="['game-card']"
+            [qzDropZoneDisabled]="!c.decoyTarget(side, card)"
+            (qzDrop)="drop($event, row, card.uid)"
+            (mouseenter)="c.preview(card.id)"
+            (focus)="c.preview(card.id)"
+            (click)="boardCard($event, side, row, card.uid, card.id)"
+          ></button>
+          } @empty { @if (c.rowValid(side, row)) {
+          <span class="row-empty"><lmn-plus [size]="16" /></span>
+          } }
+        </div>
+        @let rowScore = c.E.scores(game, side)[row];
+        <div class="row-score" [gameBump]="rowScore">{{ rowScore }}</div>
+      </div>
+      } @if (side === 1) {
+      <div
+        class="midline"
+        [class.effect-ready]="c.special && c.canPlay()"
+        qzDropZone
+        [qzDropZoneAccept]="['game-card']"
+        [qzDropZoneDisabled]="!c.special || !c.canPlay()"
         (qzDrop)="drop($event)"
-        (click)="c.special&&c.canPlay()?act('play-special'):null"
+        (click)="c.special && c.canPlay() ? act('play-special') : null"
         (keydown.enter)="activateSpecial($event)"
         (keydown.space)="activateSpecial($event)"
-        [attr.role]="c.special?'button':null"
-        [attr.tabindex]="c.special?0:null"
+        [attr.role]="c.special ? 'button' : null"
+        [attr.tabindex]="c.special ? 0 : null"
       >
-        <div class="eyebrow">{{c.t('weather')}}</div>
-        <div class="weather-icons">
-          @for(w of game.weather;track w.card.uid){<span
-            [title]="c.name(w.card)"
-            >{{c.symbols[c.E.def(w.card).ability]}}</span
-          >}@empty{☀}
-        </div>
-        <span class="muted"
-          >@for(w of game.weather;track w.card.uid){{{c.name(w.card)}} }@empty{
-          {{c.t('noWeather')}} }</span
+        <span
+          >{{ c.special ? c.t("apply") + " · " + c.name(c.selectedDefinition!) :
+          c.t("title") }}</span
         >
       </div>
-      }}
-    </aside>
-    <section class="board-center">
-      <div class="battle-status">
-        <span>{{c.t('round')}} {{game.round}} / 3</span
-        ><span class="turn-indicator" [moveLoop]="game.turn===1?'pulse':'none'"
-          ><i class="turn-dot"></i
-          >{{c.t(game.turn===0?'yourTurn':'thinking')}}</span
+      } }
+    </div>
+
+    <div class="hand-header">
+      <span>{{ c.t("hand") }} · <b>{{ game.players[0].hand.length }}</b></span>
+      @if (c.handPages > 1) {
+      <div class="hand-pagination">
+        <button
+          voltButton
+          size="icon"
+          variant="ghost"
+          (click)="act('hand-prev')"
+          [disabled]="c.handPage === 0"
+          [attr.aria-label]="c.t('previousCards')"
+          [qzTooltip]="c.t('previousCards')"
         >
+          <lmn-chevron-left [size]="16" />
+        </button>
+        <span>{{ c.handPage + 1 }} / {{ c.handPages }}</span>
+        <button
+          voltButton
+          size="icon"
+          variant="ghost"
+          (click)="act('hand-next')"
+          [disabled]="c.handPage === c.handPages - 1"
+          [attr.aria-label]="c.t('nextCards')"
+          [qzTooltip]="c.t('nextCards')"
+        >
+          <lmn-chevron-right [size]="16" />
+        </button>
       </div>
-      <div class="battlefield" [class.special-aim]="c.special">
-        @for(side of [1,0];track side){@for(row of (side?[2,1,0]:[0,1,2]);track
-        row){@let p=game.players[side];
-        <div
-          [class]="'battle-row '+p.f+(side?' enemy':'')"
-          [class.valid]="c.rowValid(side,row)"
-          [class.weathered]="weathered(row)"
-          [attr.data-row]="row"
-          qzDropZone
-          [qzDropZoneAccept]="['game-card']"
-          [qzDropZoneDisabled]="!c.rowValid(side,row)"
-          (qzDrop)="drop($event,row)"
-          [attr.role]="c.rowValid(side,row)?'button':null"
-          [attr.tabindex]="c.rowValid(side,row)?0:null"
-          [attr.aria-label]="c.t(c.E.ROWS[row])"
-          (click)="c.rowValid(side,row)?act('row',{row:row}):null"
-          (keydown.enter)="activateRow($event,side,row)"
-          (keydown.space)="activateRow($event,side,row)"
+      }
+    </div>
+    <div class="hand" [class.turn-lock]="game.turn === 1">
+      @for (card of c.hand; track card.uid) {
+      <button
+        [gameCard]="card"
+        move="fade-up"
+        moveWhileHover="lift"
+        moveWhileTap="press"
+        [active]="c.selected === card.uid"
+        qzDraggable
+        qzDraggableType="game-card"
+        [qzDraggableData]="{ uid: card.uid }"
+        [qzDraggableDisabled]="!c.canPlay()"
+        (qzDragStart)="dragStart(card.uid)"
+        (click)="act('hand', { uid: card.uid })"
+        (mouseenter)="c.preview(card.id)"
+        (focus)="c.preview(card.id)"
+      ></button>
+      } @empty {
+      <div class="hint">{{ c.t("noCards") }}</div>
+      }
+    </div>
+
+    <volt-card class="action-dock">
+      <div class="action-copy" aria-live="polite">
+        <strong
+          >{{ c.selectedDefinition ? c.name(c.selectedDefinition) + " · " +
+          c.ab(c.selectedDefinition)[c.lang] : c.t(game.turn === 0 ? "yourTurn"
+          : "thinking") }}</strong
         >
-          <div class="row-label" [title]="c.t(c.E.ROWS[row])">
-            {{c.rowIcon[c.E.ROWS[row]]}}<small>{{c.t(c.E.ROWS[row])}}</small>@if(p.horn[row]){<span
-              class="horn-slot"
-              >⚑</span
-            >}
-          </div>
-          <div class="row-cards">
-            @for(card of p.rows[row];track card.uid){<button
-              [gameCard]="card"
-              [moveWhileHover]="'lift'"
-              [moveWhileTap]="'press'"
-              [power]="c.E.strength(game,side,row,card)"
-              [target]="c.decoyTarget(side,card)"
-              [attr.data-row]="row"
-              [attr.data-uid]="card.uid"
-              qzDropZone
-              [qzDropZoneAccept]="['game-card']"
-              [qzDropZoneDisabled]="!c.decoyTarget(side,card)"
-              (qzDrop)="drop($event,row,card.uid)"
-              (mouseenter)="c.preview(card.id)"
-              (click)="boardCard($event,side,row,card.uid,card.id)"
-            ></button
-            >}@empty{<span class="row-empty"
-              >{{c.rowValid(side,row)?'＋':c.t('emptyRow')}}</span
-            >}
-          </div>
-          <div class="row-score">{{c.E.scores(game,side)[row]}}</div>
-        </div>
-        } @if(side===1){
-        <div
-          class="midline"
-          [class.effect-ready]="c.special&&c.canPlay()"
-          qzDropZone
-          [qzDropZoneAccept]="['game-card']"
-          [qzDropZoneDisabled]="!c.special||!c.canPlay()"
-          (qzDrop)="drop($event)"
-          (click)="c.special&&c.canPlay()?act('play-special'):null"
-          (keydown.enter)="activateSpecial($event)"
-          (keydown.space)="activateSpecial($event)"
-          [attr.role]="c.special?'button':null"
-          [attr.tabindex]="c.special?0:null"
-        >
-          {{c.special?c.t('apply')+' ·
-          '+c.name(c.selectedDefinition!):c.t('title')}}
-        </div>
-        }}
+        <p>{{ c.handHint }}</p>
       </div>
-      <div class="hand-header">
-        <span>{{c.t('hand')}} · {{game.players[0].hand.length}}</span
-        >@if(c.handPages>1){
-        <div class="hand-pagination">
-          <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-            class="ghost small"
-            (click)="act('hand-prev')"
-            [disabled]="c.handPage===0"
-            [moveDisabled]="c.handPage===0"
-            [attr.aria-label]="c.t('previousCards')"
-          >
-            ‹</button
-          ><span>{{c.handPage+1}} / {{c.handPages}}</span
-          ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-            class="ghost small"
-            (click)="act('hand-next')"
-            [disabled]="c.handPage===c.handPages-1"
-            [moveDisabled]="c.handPage===c.handPages-1"
-            [attr.aria-label]="c.t('nextCards')"
-          >
-            ›
-          </button>
-        </div>
+      <div class="dock-buttons">
+        @if (c.special) {
+        <button
+          voltButton
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          class="play-effect"
+          (click)="act('play-special')"
+          [disabled]="!c.canPlay()"
+          [moveDisabled]="!c.canPlay()"
+        >
+          <lmn-sparkles [size]="16" /> {{ c.t("apply") }}
+        </button>
+        } @if (c.selectedDefinition; as d) {
+        <button
+          voltButton
+          size="icon"
+          variant="ghost"
+          (click)="act('inspect', { id: d.id })"
+          [attr.aria-label]="c.t('moreInfo')"
+          [qzTooltip]="c.t('moreInfo')"
+        >
+          <lmn-information-circle [size]="20" />
+        </button>
+        <button
+          voltButton
+          size="icon"
+          variant="ghost"
+          (click)="act('cancel')"
+          [attr.aria-label]="c.t('cancel')"
+          [qzTooltip]="c.t('cancel')"
+        >
+          <lmn-x-mark [size]="20" />
+        </button>
         }
+        <button
+          voltButton
+          [variant]="c.special ? 'outline' : 'solid'"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          class="pass-button"
+          (click)="act('pass')"
+          [disabled]="!c.canPlay()"
+          [moveDisabled]="!c.canPlay()"
+        >
+          <lmn-hand-raised [size]="16" /> {{ c.t("pass") }}
+        </button>
       </div>
-      <div class="hand" [class.turn-lock]="game.turn===1">
-        @for(card of c.hand;track card.uid){<button
-          [gameCard]="card"
-          [moveWhileHover]="'lift'"
-          [moveWhileTap]="'press'"
-          [active]="c.selected===card.uid"
-          qzDraggable
-          qzDraggableType="game-card"
-          [qzDraggableData]="{uid:card.uid}"
-          [qzDraggableDisabled]="!c.canPlay()"
-          (qzDragStart)="dragStart(card.uid)"
-          (click)="act('hand',{uid:card.uid})"
-          (mouseenter)="c.preview(card.id)"
-        ></button
-        >}@empty{
-        <div class="hint">{{c.t('noCards')}}</div>
-        }
-      </div>
-      <div class="action-dock">
-        <div class="action-copy">
-          <strong
-            >{{c.selectedDefinition?c.name(c.selectedDefinition)+' ·
-            '+c.ab(c.selectedDefinition)[c.lang]:c.t(game.turn===0?'yourTurn':'thinking')}}</strong
-          >
-          <p>{{c.handHint}}</p>
-        </div>
-        <div class="dock-buttons">
-          @if(c.special){<button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-            class="primary play-effect"
-            [moveLoop]="{boxShadow:['0 0 18px #d6b3642b','0 0 22px #d6b36455']}"
-            moveLoopType="reverse"
-            (click)="act('play-special')"
-            [disabled]="!c.canPlay()"
-            [moveDisabled]="!c.canPlay()"
-          >
-            {{c.t('apply')}}</button
-          >}@if(c.selectedDefinition;as d){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-            class="ghost inspect-selected"
-            (click)="act('inspect',{id:d.id})"
-            [attr.aria-label]="c.t('moreInfo')"
-          >
-            ⓘ</button
-          ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-            class="ghost cancel-action"
-            (click)="act('cancel')"
-            [attr.aria-label]="c.t('cancel')"
-          >
-            ×</button
-          >}<button voltButton [variant]="c.special?'ghost':'solid'" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-            [class]="(c.special?'ghost':'primary')+' pass-button'"
-            (click)="act('pass')"
-            [disabled]="!c.canPlay()"
-            [moveDisabled]="!c.canPlay()"
-          >
-            {{c.t('pass')}} →
-          </button>
-        </div>
-      </div>
-    </section>
-    <aside class="right-column">
-      <div class="detail">
-        <div class="eyebrow">{{c.t('preview')}}</div>
-        <game-detail [id]="c.hover||c.selectedDefinition?.id" [large]="true" />
-      </div>
-      <div class="log">
-        <div class="eyebrow">{{c.t('events')}}</div>
-        @for(e of game.log.slice(0,4);track $index){
-        <div class="log-entry">{{c.logText(e)}}</div>
-        }
-      </div>
-    </aside>
-  </main>
+    </volt-card>
+  </section>
+
+  @if (showInspector()) {
+  <aside class="right-column">
+    <volt-card class="detail">
+      <div class="eyebrow">{{ c.t("preview") }}</div>
+      <game-detail [id]="c.hover || c.selectedDefinition?.id" [large]="true" />
+    </volt-card>
+    @if (showLog()) {
+    <div class="log" role="log" aria-live="polite">
+      <div class="eyebrow">{{ c.t("events") }}</div>
+      @for (e of game.log.slice(0, 4); track e) {
+      <div class="log-entry" move="fade-left">{{ c.logText(e) }}</div>
+      }
+    </div>
+    }
+  </aside>
+  }
+</main>
 }

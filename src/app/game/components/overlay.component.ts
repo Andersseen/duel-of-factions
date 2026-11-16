@@ -1,38 +1,98 @@
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import {
-  Component,
-  ChangeDetectionStrategy,
-  DestroyRef,
-  effect,
-  inject,
-  TemplateRef,
-  viewChild,
-  ViewContainerRef,
-} from "@angular/core";
-import { GameStore } from "../game.store";
-import { CardComponent } from "./card.component";
-import { DetailComponent } from "./detail.component";
-import {
-  DialogRef,
-  DialogService,
-  SwitchDirective,
-  ToastService,
-} from "@quartz-headless/primitives";
+  VoltAlert,
+  VoltAlertDescription,
+  VoltAvatar,
+  VoltBadge,
+  VoltCard,
+  VoltDialogContent,
+  VoltDialogDescription,
+  VoltDialogOverlay,
+  VoltDialogRoot,
+  VoltDialogTitle,
+  VoltEmptyState,
+  VoltEmptyStateDescription,
+  VoltNativeButton,
+  VoltRadioGroup,
+  VoltRadioItem,
+  VoltSlider,
+  VoltSwitch,
+  VoltToastService,
+} from "@voltui/components";
 import {
   MoveAnimateDirective,
   MoveHoverDirective,
   MoveTapDirective,
 } from "angular-movement";
-import { VoltNativeButton } from "@voltui/components";
+import { LmnArchiveBoxIcon } from "lumen-icons/archive-box";
+import { LmnArrowPathIcon } from "lumen-icons/arrow-path";
+import { LmnArrowRightIcon } from "lumen-icons/arrow-right";
+import { LmnArrowsPointingInIcon } from "lumen-icons/arrows-pointing-in";
+import { LmnArrowsPointingOutIcon } from "lumen-icons/arrows-pointing-out";
+import { LmnBookOpenIcon } from "lumen-icons/book-open";
+import { LmnHandRaisedIcon } from "lumen-icons/hand-raised";
+import { LmnHomeIcon } from "lumen-icons/home";
+import { LmnInformationCircleIcon } from "lumen-icons/information-circle";
+import { LmnMusicalNoteIcon } from "lumen-icons/musical-note";
+import { LmnSpeakerWaveIcon } from "lumen-icons/speaker-wave";
+import { LmnXMarkIcon } from "lumen-icons/x-mark";
+import { GameStore } from "../game.store";
+import { CardComponent } from "./card.component";
+import { DetailComponent } from "./detail.component";
+import { PortraitComponent } from "./portrait.component";
+
+/** Everything the single game dialog can show, derived from the store. */
+export type DialogKind =
+  | "settings"
+  | "deck-help"
+  | "prepare-help"
+  | "help"
+  | "quit"
+  | "pass"
+  | "inspect"
+  | "grave"
+  | "round"
+  | "revive"
+  | null;
+
 @Component({
   selector: "game-overlay",
   imports: [
     CardComponent,
     DetailComponent,
-    SwitchDirective,
+    PortraitComponent,
     MoveAnimateDirective,
     MoveHoverDirective,
     MoveTapDirective,
+    VoltAlert,
+    VoltAlertDescription,
+    VoltAvatar,
+    VoltBadge,
+    VoltCard,
+    VoltDialogContent,
+    VoltDialogDescription,
+    VoltDialogOverlay,
+    VoltDialogRoot,
+    VoltDialogTitle,
+    VoltEmptyState,
+    VoltEmptyStateDescription,
     VoltNativeButton,
+    VoltRadioGroup,
+    VoltRadioItem,
+    VoltSlider,
+    VoltSwitch,
+    LmnArchiveBoxIcon,
+    LmnArrowPathIcon,
+    LmnArrowRightIcon,
+    LmnArrowsPointingInIcon,
+    LmnArrowsPointingOutIcon,
+    LmnBookOpenIcon,
+    LmnHandRaisedIcon,
+    LmnHomeIcon,
+    LmnInformationCircleIcon,
+    LmnMusicalNoteIcon,
+    LmnSpeakerWaveIcon,
+    LmnXMarkIcon,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: ":host{display:contents}",
@@ -40,72 +100,126 @@ import { VoltNativeButton } from "@voltui/components";
 })
 export class OverlayComponent {
   readonly c = inject(GameStore).controller;
-  private readonly dialogs = inject(DialogService);
-  private readonly toasts = inject(ToastService);
-  private readonly viewContainer = inject(ViewContainerRef);
-  private readonly dialogTemplate =
-    viewChild.required<TemplateRef<unknown>>("dialogTemplate");
-  private activeDialog: DialogRef | null = null;
-  private dismissible = true;
+  private readonly toasts = inject(VoltToastService);
+  readonly languages = ["Español", "Українська", "English"];
 
-  constructor() {
-    inject(DestroyRef).onDestroy(() => {
-      const dialog = this.activeDialog;
-      this.activeDialog = null;
-      dialog?.close();
-    });
+  kind(): DialogKind {
+    const modal = this.c.modal;
+    if (typeof modal === "string") return modal;
+    if (this.c.inspectId) return "inspect";
+    if (this.c.graveSide !== undefined) return "grave";
+    if (this.c.roundNotice) return "round";
+    if (this.c.screen === "battle" && this.c.game?.pending?.side === 0)
+      return "revive";
+    return null;
+  }
+
+  isOpen() {
+    return this.kind() !== null;
+  }
+
+  /** Round results and revive choices must be answered; confirmations use their own buttons. */
+  closable() {
+    const kind = this.kind();
+    return kind !== null && !["round", "revive", "quit", "pass"].includes(kind);
+  }
+
+  alert() {
+    return this.kind() === "quit" || this.kind() === "pass";
+  }
+
+  onOpenChange(open: boolean) {
+    if (!open && this.closable()) this.act("close");
+  }
+
+  chooseDifficulty(value: string | null) {
+    if (value !== null) this.act("difficulty", { level: value });
+  }
+
+  chooseLanguage(value: string | null) {
+    if (value !== null) this.act("lang", { lang: value });
+  }
+
+  eyebrow(): string | null {
+    switch (this.kind()) {
+      case "settings":
+      case "help":
+        return this.c.t("title");
+      case "deck-help":
+        return this.c.t(this.c.faction);
+      case "round":
+        return this.c.t("roundEnd");
+      case "grave":
+        return this.c.t(this.c.graveSide ? "rival" : "you");
+      default:
+        return null;
+    }
   }
 
   dialogTitle() {
-    if (this.c.modal === "settings") return this.c.t("settings");
-    if (this.c.modal === "deck-help") return this.c.t("deckInfo");
-    if (this.c.modal === "prepare-help") return this.c.t("initialHand");
-    if (this.c.modal === "help") return this.c.t("help");
-    if (this.c.modal === "quit") return this.c.t("quitTitle");
-    if (this.c.modal === "pass") return this.c.t("confirmPass");
-    if (this.c.inspectId) return this.c.name(this.c.E.cards[this.c.inspectId]);
-    if (this.c.graveSide !== undefined) return this.c.t("grave");
-    return this.c.t(this.c.roundNotice ? "roundEnd" : "revive");
+    const score = this.c.roundNotice;
+    switch (this.kind()) {
+      case "settings":
+        return this.c.t("settings");
+      case "deck-help":
+        return this.c.t("deckInfo");
+      case "prepare-help":
+        return this.c.t("initialHand");
+      case "help":
+        return this.c.t("help");
+      case "quit":
+        return this.c.t("quitTitle");
+      case "pass":
+        return this.c.t("confirmPass");
+      case "inspect":
+        return this.c.name(this.c.E.cards[this.c.inspectId!]);
+      case "grave":
+        return this.c.t("grave");
+      case "round":
+        return this.c.t(
+          !score || score[0] === score[1]
+            ? "tieRound"
+            : score[0] > score[1]
+              ? "wonRound"
+              : "lostRound",
+        );
+      case "revive":
+        return this.c.t("revive");
+      default:
+        return this.c.t("title");
+    }
   }
 
-  private readonly syncDialog = effect(() => {
-    const isOpen = Boolean(
-      this.c.modal ||
-        this.c.roundNotice ||
-        (this.c.screen === "battle" && this.c.game?.pending?.side === 0),
-    );
-    const dismissible = Boolean(this.c.modal);
-    if (isOpen && this.activeDialog && this.dismissible !== dismissible) {
-      const previous = this.activeDialog;
-      this.activeDialog = null;
-      previous.close();
+  dialogDescription() {
+    const score = this.c.roundNotice;
+    switch (this.kind()) {
+      case "settings":
+        return this.c.t("settingsHint");
+      case "deck-help":
+        return this.c.t("deckGuide");
+      case "prepare-help":
+        return this.c.t("prepareSub");
+      case "help":
+        return this.c.t("intro");
+      case "quit":
+        return this.c.t("quitBody");
+      case "pass":
+        return this.c.t("confirmPassBody");
+      case "round":
+        return this.c.t(
+          score && score[0] === score[1] ? "tieExplain" : "nextExplain",
+        );
+      case "revive":
+        return this.c.t("reviveSub");
+      default:
+        return this.dialogTitle();
     }
-    const activeDialog = this.activeDialog;
+  }
 
-    if (isOpen && !activeDialog) {
-      const dialog = this.dialogs.open(
-        this.dialogTemplate(),
-        this.viewContainer,
-        {
-          position: "center",
-          panelClass: "qz-game-dialog",
-          backdropClass: "qz-game-backdrop",
-          closeOnEscape: dismissible,
-          closeOnBackdropClick: dismissible,
-        },
-      );
-      this.activeDialog = dialog;
-      this.dismissible = dismissible;
-      dialog.closed$.subscribe(() => {
-        if (this.activeDialog !== dialog) return;
-        this.activeDialog = null;
-        this.act("close");
-      });
-    } else if (!isOpen && activeDialog) {
-      this.activeDialog = null;
-      activeDialog.close();
-    }
-  });
+  descriptionVisible() {
+    const kind = this.kind();
+    return kind !== "inspect" && kind !== "grave" && kind !== "help";
+  }
 
   act(action: string, data: Record<string, string | number> = {}) {
     this.c.action(
@@ -113,13 +227,15 @@ export class OverlayComponent {
       Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])),
     );
     if (action === "restore") {
-      this.toasts.success(this.c.t("restoreToast"), this.c.t("deckInfo"), {
+      this.toasts.success(this.c.t("deckInfo"), {
+        description: this.c.t("restoreToast"),
         duration: 2800,
-        position: "top-right",
+        placement: "top-end",
       });
     }
   }
-  volume(event: Event) {
-    this.c.setVolume((event.target as HTMLInputElement).value);
+
+  volume(value: number) {
+    this.c.setVolume(String(value));
   }
 }

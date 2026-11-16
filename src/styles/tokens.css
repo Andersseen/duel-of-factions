@@ -1,0 +1,89 @@
+/*
+ * Game palette. The faction theme lives on <body data-theme> (set by the store) and on any
+ * element with [data-faction]; both feed Volt's semantic tokens, so every Volt atom inside
+ * — including dialogs portalled to <body> — picks up the right colours automatically.
+ */
+body {
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+
+  /* Neutral realm (menu, faction choice). */
+  --bg: #18191f;
+  --panel: #25262e;
+  --line: #494954;
+  --ink: #eee5cd;
+  --ink-muted: #bab9b5;
+  --gold: #dab36a;
+  --gold-soft: #f0d28f;
+  --realm: #777b91;
+  --realm-rgb: 119, 123, 145;
+  --danger: #ef9d88;
+
+  /* Card paper. */
+  --paper: #d4c296;
+  --paper-hover: #e0cea6;
+  --paper-ink: #242d22;
+  --paper-muted: #5a5440;
+}
+
+body[data-theme="forest"],
+[data-faction="forest"] {
+  --bg: #111e17;
+  --panel: #203329;
+  --line: #496451;
+  --realm: #89ad7e;
+  --realm-rgb: 80, 132, 91;
+  --card-edge: #83916a;
+}
+body[data-theme="granite"],
+[data-faction="granite"] {
+  --bg: #261719;
+  --panel: #3c2527;
+  --line: #795052;
+  --realm: #d19080;
+  --realm-rgb: 165, 69, 72;
+  --card-edge: #ac7e58;
+}
+body[data-theme="tides"],
+[data-faction="tides"] {
+  --bg: #10232b;
+  --panel: #1c3641;
+  --line: #416c7b;
+  --realm: #83bfca;
+  --realm-rgb: 46, 137, 158;
+  --card-edge: #6a9f9c;
+}
+body[data-theme="sun"],
+[data-faction="sun"] {
+  --bg: #282115;
+  --panel: #3c3220;
+  --line: #7d6b3c;
+  --realm: #e4c66c;
+  --realm-rgb: 184, 143, 49;
+  --card-edge: #b69a60;
+}
+[data-faction="neutral"] {
+  --card-edge: #8c8256;
+}
+
+/* The game palette expressed through Volt's semantic tokens. */
+body,
+[data-faction] {
+  --background: var(--bg);
+  --foreground: var(--ink);
+  --surface: var(--panel);
+  --surface-foreground: var(--ink);
+  --popover: var(--panel);
+  --popover-foreground: var(--ink);
+  --primary: var(--gold);
+  --primary-foreground: #1d241b;
+  --secondary: color-mix(in oklab, var(--realm) 30%, var(--panel));
+  --secondary-foreground: var(--ink);
+  --muted: color-mix(in oklab, var(--line) 55%, var(--panel));
+  --muted-foreground: var(--ink-muted);
+  --accent: color-mix(in oklab, var(--realm) 22%, var(--panel));
+  --accent-foreground: var(--ink);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--gold);
+}

@@ -1,0 +1,175 @@
+/*
+ * Playing card (CardComponent). One definition for every context: the card is a size
+ * container and its parts scale in `cqi`, so the hand, the rows, the deck grid and the
+ * inspect view only decide the card's *size*, never its typography.
+ */
+.game-card {
+  --edge: var(--card-edge, #8c8256);
+  container-type: inline-size;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  width: 100%;
+  aspect-ratio: 0.7;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--edge);
+  border-radius: clamp(3px, 6cqi, 9px);
+  background: var(--paper);
+  color: var(--paper-ink);
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 3px 10px #0004;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.18s ease;
+}
+div.game-card {
+  cursor: default;
+}
+.game-card.hero {
+  --edge: #e8be64;
+  box-shadow:
+    0 0 0 1px #e8be6455,
+    0 3px 12px #0005;
+}
+button.game-card:hover:not(:disabled) {
+  background: var(--paper-hover);
+  z-index: 10;
+}
+.game-card:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+.game-card:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+/* `transform` composes with Movement's hover lift, which animates `translate`. */
+.game-card.selected {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+  transform: translateY(-6px);
+}
+.game-card.target {
+  outline: 2px dashed var(--gold);
+  outline-offset: 1px;
+  animation: card-target 1.2s ease-in-out infinite;
+}
+@keyframes card-target {
+  50% {
+    outline-color: transparent;
+  }
+}
+
+.card-art {
+  grid-row: 1;
+  position: relative;
+  display: block;
+  min-height: 0;
+  background-color: #415139;
+}
+.card-art.special-art {
+  display: grid;
+  place-items: center;
+  font-size: 34cqi;
+  background: radial-gradient(circle, #a1986566, #293b36);
+  color: #e3d3a2;
+}
+
+.power {
+  position: absolute;
+  top: 4cqi;
+  left: 4cqi;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: max(15px, 24cqi);
+  height: max(15px, 24cqi);
+  border: 1px solid #8f814a;
+  border-radius: 50%;
+  background: #ece0b8;
+  color: #263123;
+  font: 700 max(10px, 15cqi) / 1 var(--font-display);
+  font-variant-numeric: lining-nums tabular-nums;
+  box-shadow: 0 2px 5px #0004;
+}
+.hero .power {
+  background: #dcb864;
+  border-color: #f9e19d;
+}
+.power.boosted {
+  background: #cfe7b4;
+  border-color: #6f9b4f;
+  color: #1f4012;
+}
+.power.weakened {
+  background: #f0c3b8;
+  border-color: #b4614e;
+  color: #5a1a0e;
+}
+
+.card-ability {
+  position: absolute;
+  top: 4cqi;
+  right: 4cqi;
+  z-index: 2;
+  min-width: max(13px, 18cqi);
+  padding: 1cqi 2cqi;
+  border-radius: 3px;
+  background: #18271eed;
+  color: #e2ce98;
+  font-size: max(9px, 12cqi);
+  line-height: 1.3;
+}
+.card-ability[data-ability="medic"] {
+  background: #285f45;
+  color: #fff;
+}
+.card-ability[data-ability="spy"] {
+  background: #49355f;
+  color: #fff;
+}
+.card-ability[data-ability="hero"] {
+  background: #725315;
+  color: #fff3b2;
+}
+
+.card-name {
+  display: grid;
+  place-items: center;
+  min-height: 2.4em;
+  padding: 4cqi 3cqi 1cqi;
+  font: 700 clamp(8px, 10.5cqi, 15px) / 1.05 var(--font-display);
+  overflow: hidden;
+  text-wrap: balance;
+}
+.card-row {
+  padding: 0 3cqi 4cqi;
+  font-size: clamp(7px, 7.5cqi, 11px);
+  font-weight: 500;
+  color: var(--paper-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Board-size cards: art, power and ability only. */
+@container (max-width: 70px) {
+  .card-name,
+  .card-row {
+    display: none;
+  }
+  .card-ability {
+    font-size: max(8px, 14cqi);
+  }
+}
+/* Hand-size cards on short screens: name only. */
+@container (max-width: 84px) {
+  .card-row {
+    display: none;
+  }
+}

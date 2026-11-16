@@ -1,0 +1,264 @@
+/* Fullscreen game shell: the viewport is the stage, not a document. */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-synthesis: none;
+  color: var(--ink);
+  background:
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(var(--realm-rgb), 0.24),
+      transparent 80%
+    ),
+    var(--bg);
+  transition: background-color 0.4s ease;
+  -webkit-font-smoothing: antialiased;
+}
+app-root,
+app-game {
+  display: contents;
+}
+#app {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-variant-numeric: lining-nums;
+  font-weight: 600;
+  line-height: 1.05;
+}
+h1 {
+  font-size: clamp(46px, 7vw, 92px);
+  line-height: 0.94;
+}
+h2 {
+  font-size: clamp(28px, 3.8vh, 40px);
+}
+h3 {
+  font-size: 25px;
+}
+
+/* Cormorant defaults to old-style figures ("11" reads as "I I"): scores use lining ones. */
+.total,
+.row-score,
+.res-score,
+.power,
+.deck-total strong {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.muted {
+  color: var(--ink-muted);
+}
+.notice {
+  color: var(--gold);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+:focus-visible {
+  outline-color: var(--gold);
+}
+
+/* Settings: always reachable, top-right, above every screen. */
+.game-controls {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 40;
+}
+.settings-button {
+  border-radius: 999px;
+  color: var(--gold);
+  background: color-mix(in oklab, var(--panel) 85%, transparent);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 16px #0003;
+}
+
+/* Shared page scaffold for faction, deck and prepare screens. */
+.page {
+  height: 100dvh;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 4vw 20px;
+  overflow: hidden;
+}
+.page-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+  margin-bottom: 18px;
+  padding-right: 52px;
+}
+.page-title h2 {
+  margin: 5px 0;
+}
+.page-title p {
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+.info-button {
+  border-radius: 999px;
+  color: var(--gold);
+}
+
+/* Small "‹ 1 / 2 ›" pagers. */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+/* Two-faction "you vs rival" strip (prepare + result). */
+.matchup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+.matchup > span {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--gold);
+}
+.avatar {
+  width: 60px;
+  height: 66px;
+  border-radius: 8px;
+  border: 1px solid #9d8b56;
+  background: var(--panel);
+}
+.avatar > .portrait {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Portraits are SVG crops of shared sprite sheets (see PortraitComponent). */
+.portrait {
+  position: relative;
+  overflow: hidden;
+  background-color: #26382c;
+}
+.portrait-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Quartz tooltips: Quartz owns placement, focus and aria-describedby; Volt tokens own the look. */
+[data-qz-tooltip] {
+  max-width: 240px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--popover);
+  color: var(--popover-foreground);
+  box-shadow: var(--shadow-md);
+  font: 600 12px/1.3 var(--font-body);
+  letter-spacing: 0.02em;
+  animation: qz-tooltip-in 140ms ease-out;
+}
+@keyframes qz-tooltip-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+/* Quartz drag & drop feedback (hand → rows). */
+[data-qz-drag-over] {
+  outline: 3px solid var(--gold-soft);
+  outline-offset: -3px;
+}
+.qz-draggable:not(.qz-disabled) {
+  cursor: grab;
+}
+.qz-draggable.qz-dragging {
+  opacity: 0.48;
+}
+
+@media (max-width: 700px) {
+  .game-controls {
+    top: max(9px, env(safe-area-inset-top));
+    right: 10px;
+  }
+  .page {
+    padding: 16px 12px max(12px, env(safe-area-inset-bottom));
+  }
+  .page-title {
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding-right: 44px;
+    gap: 8px;
+  }
+  .page-title h2 {
+    font-size: 27px;
+  }
+  .page-title p {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .page-title .eyebrow {
+    font-size: 8px;
+  }
+}
+@media (max-height: 600px) {
+  .page-title p {
+    display: none;
+  }
+}
+
+/* Movement honours reduced motion on its own; cover CSS-only feedback (Volt, tooltips) too. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0s !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,207 @@
+/* Deck builder. */
+.deck-navigation {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+/* The filter scrolls sideways instead of wrapping, so phones keep one tidy row. */
+.card-filter {
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.card-filter > volt-toggle-group-item {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.builder {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 28px;
+}
+.card-grid {
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+  gap: 18px 12px;
+  align-content: start;
+  padding: 8px 8px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+.card-wrap {
+  position: relative;
+  min-width: 0;
+}
+.card-wrap:not(.in-deck) > .game-card {
+  filter: saturate(0.55) brightness(0.85);
+}
+.copy-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding-top: 8px;
+}
+.copy-controls > button {
+  width: 30px;
+  height: 30px;
+}
+.copy-count {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+}
+.in-deck .copy-count {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.deck-aside {
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  max-height: 100%;
+  overflow: auto;
+  padding: 20px;
+  scrollbar-width: thin;
+}
+.deck-leader {
+  height: auto;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 4px;
+  text-align: left;
+  white-space: normal;
+}
+.deck-leader-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.deck-leader-name {
+  font: 600 20px/1.1 var(--font-display);
+  color: var(--ink);
+}
+.deck-rules {
+  display: grid;
+  gap: 12px;
+}
+.deck-meter {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  font-size: 12px;
+}
+.deck-meter > volt-meter-track {
+  grid-column: 1 / -1;
+}
+.deck-meter[data-ok="false"] {
+  --primary: var(--danger);
+}
+.deck-total {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.deck-total strong {
+  font: 600 34px/1 var(--font-display);
+  color: var(--gold);
+}
+.deck-total small {
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+.deck-start {
+  width: 100%;
+}
+.preview-small {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+.preview-small:empty {
+  display: none;
+}
+.preview-small p {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+@media (max-width: 1100px) {
+  .builder {
+    grid-template-columns: minmax(0, 1fr) 250px;
+  }
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .deck-navigation {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .deck-navigation > button {
+    align-self: flex-start;
+  }
+  .builder {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .card-grid {
+    flex: 1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px 10px;
+    padding: 4px 2px 12px;
+  }
+  .deck-aside {
+    flex-shrink: 0;
+    gap: 8px;
+    padding: 10px;
+    overflow: visible;
+  }
+  .deck-leader,
+  .preview-small {
+    display: none;
+  }
+  .deck-rules {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .deck-meter {
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  .deck-total {
+    display: none;
+  }
+  .deck-start {
+    height: 40px;
+  }
+}
+@media (max-width: 420px) {
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-height: 730px) and (min-width: 701px) {
+  .deck-aside {
+    gap: 12px;
+    padding: 16px;
+  }
+  .preview-small {
+    display: none;
+  }
+}

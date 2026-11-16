@@ -1,0 +1,770 @@
+/*
+ * Battle board. Three columns on desktop (players · board · inspector), two on tablets,
+ * and a stacked layout on phones. Every track is sized to the viewport: the board never
+ * scrolls as a page.
+ */
+.board-layout {
+  height: 100dvh;
+  max-width: 1600px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) 190px;
+  gap: 15px;
+  padding: 12px 18px;
+  overflow: hidden;
+}
+
+/* ── Players column ─────────────────────────────────────────────── */
+.side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+.combatant {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-height: 0;
+  flex-shrink: 1;
+  padding: 12px 9px;
+  text-align: center;
+  border-color: var(--line);
+  background:
+    linear-gradient(
+      110deg,
+      rgba(var(--realm-rgb), 0.32),
+      rgba(var(--realm-rgb), 0.13)
+    ),
+    var(--bg);
+}
+.combatant-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.combatant-name {
+  min-width: 0;
+}
+.combatant small {
+  font-size: 10px;
+  color: var(--ink-muted);
+}
+.combatant h3 {
+  font-size: 20px;
+}
+.gems {
+  display: flex;
+  gap: 4px;
+}
+.total {
+  font: 600 36px/1 var(--font-display);
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--gold);
+}
+.count-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+.hand-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.combatant-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+.combatant-actions > button {
+  width: 100%;
+}
+.passed {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.weather-panel {
+  flex-shrink: 0;
+  padding: 9px 11px;
+  border-color: var(--line);
+  background: var(--panel);
+  font-size: 10px;
+}
+.weather-panel .eyebrow {
+  font-size: 8px;
+  letter-spacing: 0.13em;
+}
+.weather-icons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  color: #d7e1cc;
+}
+.weather-chip {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #8db0b333;
+  font-size: 18px;
+}
+.weather-clear {
+  color: var(--ink-muted);
+}
+.effect-ready {
+  cursor: pointer;
+  border-color: var(--gold);
+  color: var(--gold-soft);
+  background: #b99c3c22;
+}
+.effect-ready:focus-visible {
+  outline: 2px solid var(--gold);
+}
+
+/* ── Board ──────────────────────────────────────────────────────── */
+.board-center {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 25px minmax(0, 1fr) 27px clamp(85px, 16dvh, 145px) 69px;
+  gap: 6px;
+  overflow: hidden;
+}
+.battle-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 50px;
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+.turn-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gold);
+}
+.turn-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 12px var(--gold);
+}
+.turn-indicator.waiting .turn-dot {
+  background: var(--ink-muted);
+  box-shadow: none;
+}
+
+.battlefield {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) 23px repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 7px;
+  border: 1px solid #526047;
+  border-radius: 9px;
+  background: #12141ac9;
+  box-shadow: inset 0 0 50px #0003;
+}
+.battlefield.special-aim {
+  border-color: #bfad70;
+}
+.battle-row {
+  position: relative;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 32px;
+  gap: 8px;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background:
+    linear-gradient(
+      110deg,
+      rgba(var(--realm-rgb), 0.32),
+      rgba(var(--realm-rgb), 0.13)
+    ),
+    var(--bg);
+  transition: background-color 0.15s ease;
+}
+.battle-row.valid {
+  cursor: pointer;
+  touch-action: manipulation;
+  border: 1px dashed var(--gold);
+  background: rgba(var(--realm-rgb), 0.5);
+}
+.battle-row.valid:hover {
+  background: rgba(var(--realm-rgb), 0.65);
+}
+.battle-row.valid:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+.battle-row.weathered {
+  background: linear-gradient(100deg, #99bfc144, #688a9250), var(--bg);
+  border-color: #8db0b3;
+}
+.row-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 20px;
+  color: var(--realm);
+}
+.row-label small {
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: #a3ad8f;
+}
+.horn-slot {
+  color: var(--gold);
+}
+.row-cards {
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+.row-cards > .game-card {
+  flex-shrink: 0;
+  width: auto;
+  height: min(100%, 85px);
+  max-width: 65px;
+  aspect-ratio: 0.72;
+}
+.row-empty {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  color: var(--gold);
+  opacity: 0.7;
+  pointer-events: none;
+}
+.row-score {
+  font: 600 22px/1 var(--font-display);
+  font-variant-numeric: lining-nums tabular-nums;
+  text-align: center;
+  color: #d1c59e;
+}
+
+.midline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #bbaa78;
+}
+.midline::before,
+.midline::after {
+  content: "";
+  width: 22%;
+  height: 1px;
+  background: #65725066;
+}
+
+/* ── Hand ───────────────────────────────────────────────────────── */
+.hand-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+.hand-header b {
+  color: var(--gold);
+  font-weight: 600;
+}
+.hand-pagination {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.hand-pagination > button {
+  width: 26px;
+  height: 26px;
+}
+.hand {
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: clamp(3px, 0.6vw, 9px);
+  padding: 5px 4px 3px;
+  overflow: visible;
+}
+.hand.turn-lock {
+  opacity: 0.65;
+}
+.hand > .game-card {
+  flex: 0 1 94px;
+  width: auto;
+  height: 100%;
+  min-width: 0;
+  max-width: 100px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.hint {
+  align-self: center;
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+/* ── Action dock ────────────────────────────────────────────────── */
+.action-dock {
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 11px;
+  border-color: var(--line);
+  background: var(--panel);
+}
+.action-copy {
+  min-width: 0;
+}
+.action-copy strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.action-copy p {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #b5c0a5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.dock-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.play-effect {
+  box-shadow: 0 0 18px color-mix(in oklab, var(--gold) 35%, transparent);
+  animation: glow 1.8s ease-in-out infinite alternate;
+}
+@keyframes glow {
+  to {
+    box-shadow: 0 0 24px color-mix(in oklab, var(--gold) 60%, transparent);
+  }
+}
+
+/* ── Inspector column ───────────────────────────────────────────── */
+.right-column {
+  min-height: 0;
+  overflow: hidden;
+  padding-top: 48px;
+}
+.detail {
+  padding: 12px;
+  border-color: var(--line);
+  background: var(--panel);
+}
+.detail .eyebrow {
+  margin-bottom: 8px;
+  font-size: 9px;
+  letter-spacing: 0.13em;
+}
+.detail-card {
+  width: auto;
+  height: clamp(125px, 22dvh, 200px);
+  max-width: 142px;
+  margin: 0 auto 12px;
+}
+.detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.detail h3 {
+  font-size: 21px;
+}
+.detail p {
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+.detail-empty {
+  padding: 24px 12px;
+  font-size: 12px;
+}
+.log {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.log .eyebrow {
+  font-size: 9px;
+}
+.log-entry {
+  padding: 6px 0;
+  border-bottom: 1px solid #39433588;
+  font-size: 10px;
+  line-height: 1.5;
+  color: #9eaa93;
+}
+
+/* ── Large desktop ──────────────────────────────────────────────── */
+@media (min-width: 1600px) {
+  .row-cards > .game-card {
+    height: min(100%, 96px);
+    max-width: 72px;
+  }
+}
+
+/* ── Tablet: drop the inspector column ──────────────────────────── */
+@media (max-width: 1100px) {
+  .board-layout {
+    grid-template-columns: 135px minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+  .board-center {
+    grid-template-rows: 26px minmax(0, 1fr) 27px clamp(85px, 17dvh, 145px) 72px;
+  }
+}
+
+/* ── Compact players (short desktops and every phone) ───────────── */
+@media (max-height: 730px), (max-width: 700px) {
+  .combatant {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "head total"
+      "gems count"
+      "actions actions";
+    align-items: center;
+    gap: 4px 8px;
+    padding: 9px;
+    text-align: left;
+  }
+  .combatant-head {
+    grid-area: head;
+    flex-direction: row;
+    gap: 7px;
+  }
+  .combatant .avatar {
+    width: 38px;
+    height: 42px;
+  }
+  .combatant h3 {
+    font-size: 16px;
+  }
+  .combatant small {
+    font-size: 9px;
+  }
+  .gems {
+    grid-area: gems;
+  }
+  .total {
+    grid-area: total;
+    font-size: 28px;
+  }
+  .count-line {
+    grid-area: count;
+    justify-content: flex-end;
+    font-size: 10px;
+  }
+  .combatant-actions {
+    grid-area: actions;
+  }
+  .passed {
+    top: auto;
+    bottom: 9px;
+  }
+}
+@media (max-height: 730px) and (min-width: 701px) {
+  .side-column {
+    gap: 8px;
+  }
+  .board-center {
+    grid-template-rows: 23px minmax(0, 1fr) 25px 92px 60px;
+    gap: 4px;
+  }
+  .row-label small {
+    display: none;
+  }
+  .detail-card {
+    height: 135px;
+  }
+}
+
+/* ── Phones: players on top, board below ────────────────────────── */
+@media (max-width: 700px) {
+  .board-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 5px;
+    padding: 8px 7px max(7px, env(safe-area-inset-bottom));
+  }
+  .side-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 6px;
+    padding-right: 42px;
+  }
+  /* Rival on the right, you on the left, weather as a strip underneath. */
+  .combatant.enemy {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .combatant:not(.enemy) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .combatant {
+    grid-template-areas:
+      "head total"
+      "gems count"
+      "actions actions";
+    padding: 6px 7px;
+    border-radius: 6px;
+  }
+  .combatant .avatar {
+    width: 26px;
+    height: 30px;
+  }
+  .combatant h3 {
+    font-size: 12px;
+    line-height: 1.15;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .combatant small {
+    font-size: 8px;
+  }
+  .total {
+    font-size: 22px;
+  }
+  .count-line {
+    gap: 5px;
+    font-size: 8px;
+  }
+  .count-line volt-badge {
+    display: none;
+  }
+  .combatant-actions {
+    flex-direction: row;
+  }
+  .combatant-actions > button {
+    height: 26px;
+    padding: 0 6px;
+    font-size: 9px;
+  }
+  .passed {
+    position: static;
+    grid-area: count;
+    justify-self: end;
+    font-size: 7px;
+  }
+  .side-column .weather-panel {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 8px;
+  }
+  .weather-icons {
+    margin: 0;
+  }
+  .weather-chip {
+    width: 20px;
+    height: 20px;
+    font-size: 13px;
+  }
+  .board-center {
+    grid-template-rows: 20px minmax(0, 1fr) 27px clamp(110px, 19dvh, 164px) auto;
+    gap: 4px;
+  }
+  .battle-status {
+    padding: 0 4px;
+    font-size: 9px;
+  }
+  .battlefield {
+    grid-template-rows: repeat(3, minmax(0, 1fr)) 19px repeat(3, minmax(0, 1fr));
+    gap: 3px;
+    padding: 4px;
+    border-radius: 6px;
+  }
+  .battle-row {
+    grid-template-columns: 27px minmax(0, 1fr) 27px;
+    gap: 4px;
+  }
+  .row-label {
+    font-size: 15px;
+  }
+  .row-label small {
+    display: none;
+  }
+  .row-cards > .game-card {
+    height: 100%;
+    max-width: 48px;
+    aspect-ratio: 0.75;
+  }
+  .row-score {
+    font-size: 18px;
+  }
+  .midline {
+    font-size: 7px;
+    letter-spacing: 0.08em;
+  }
+  .hand-header {
+    padding: 0 4px;
+    font-size: 10px;
+  }
+  .hand {
+    gap: 6px;
+    padding: 3px 4px;
+  }
+  .hand > .game-card {
+    flex: 1 1 0;
+    max-width: 116px;
+  }
+  .action-dock {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 7px 8px;
+  }
+  .action-copy {
+    flex: 1 1 160px;
+  }
+  .action-copy strong {
+    font-size: 10px;
+  }
+  .action-copy p {
+    font-size: 9px;
+  }
+  .dock-buttons {
+    margin-left: auto;
+  }
+}
+@media (max-height: 650px) and (max-width: 700px) {
+  /* Icon-only actions (they keep their aria-label). */
+  .combatant-actions > button {
+    width: auto;
+    flex: 1;
+  }
+  .action-label {
+    display: none;
+  }
+  .board-center {
+    grid-template-rows: 18px minmax(0, 1fr) 24px 100px auto;
+  }
+  .action-copy p {
+    display: none;
+  }
+}
+
+/* ── Landscape phones: give the rows every spare pixel ──────────── */
+@media (max-height: 500px) and (min-width: 701px) {
+  .board-layout {
+    gap: 8px;
+    padding: 6px 10px;
+  }
+  .side-column {
+    gap: 5px;
+  }
+  .combatant {
+    padding: 5px 7px;
+    gap: 2px 6px;
+  }
+  .combatant .avatar {
+    width: 26px;
+    height: 30px;
+  }
+  .combatant h3 {
+    font-size: 12px;
+  }
+  .total {
+    font-size: 20px;
+  }
+  .combatant-actions > button {
+    height: 24px;
+    font-size: 9px;
+  }
+  .count-line volt-badge {
+    display: none;
+  }
+  .weather-panel {
+    padding: 4px 7px;
+  }
+  .board-center {
+    grid-template-rows: 18px minmax(0, 1fr) 20px 74px 46px;
+    gap: 3px;
+  }
+  .battlefield {
+    grid-template-rows: repeat(3, minmax(0, 1fr)) 14px repeat(3, minmax(0, 1fr));
+    gap: 2px;
+    padding: 4px;
+  }
+  .battle-row {
+    grid-template-columns: 28px minmax(0, 1fr) 26px;
+  }
+  .row-label {
+    font-size: 13px;
+  }
+  .row-score {
+    font-size: 16px;
+  }
+  .midline {
+    font-size: 7px;
+  }
+  .hand-header {
+    font-size: 9px;
+  }
+  .action-dock {
+    padding: 4px 8px;
+  }
+  .action-copy p {
+    display: none;
+  }
+}

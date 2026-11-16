@@ -441,6 +441,10 @@ export function starter(f: string): Deck {
     d[id] = 1;
   return d;
 }
+/** Deck rules: at least this many unit cards… */
+export const MIN_UNITS = 22;
+/** …and at most this many special cards. */
+export const MAX_SPECIAL = 10;
 export function validate(d: Deck, f: string) {
   let units = 0,
     special = 0,
@@ -460,7 +464,11 @@ export function validate(d: Deck, f: string) {
     if (c.unit) units += n;
     else special += n;
   }
-  return { units, special, valid: legal && units >= 22 && special <= 10 };
+  return {
+    units,
+    special,
+    valid: legal && units >= MIN_UNITS && special <= MAX_SPECIAL,
+  };
 }
 let serial = 0;
 export function expand(d: Deck) {

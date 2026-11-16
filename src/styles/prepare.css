@@ -1,0 +1,123 @@
+/* Opening hand (mulligan). */
+.mulligan {
+  gap: 8px;
+}
+.mulligan .page-title {
+  margin-bottom: 4px;
+}
+.mulligan .avatar {
+  width: 42px;
+  height: 45px;
+}
+
+/* Desktop: the full ten-card hand in a 5 × 2 grid that fits the viewport height. */
+.starting-hand {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: center;
+  justify-items: center;
+}
+.starting-card {
+  position: relative;
+  height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  aspect-ratio: 0.7;
+  padding-bottom: 16px;
+}
+.starting-card > .game-card {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+}
+.starting-card.swap-used > .game-card {
+  opacity: 0.6;
+}
+.swap-mark {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  translate: -50% 0;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.prepare-pagination {
+  margin-top: 4px;
+}
+.prepare-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  flex-shrink: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.exchanges {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+.exchanges b {
+  display: inline-block;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Phones: the store pages the hand (2–3 cards); they share the row evenly. */
+@media (max-width: 700px) {
+  .mulligan .avatar {
+    width: 36px;
+    height: 38px;
+  }
+  .matchup > span {
+    font-size: 14px;
+  }
+  .starting-hand {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+  .starting-card {
+    height: auto;
+    width: calc((100% - (var(--shown) - 1) * 10px) / var(--shown));
+    max-width: 170px;
+    aspect-ratio: auto;
+  }
+  .starting-card > .game-card {
+    width: 100%;
+    height: auto;
+    max-height: 46dvh;
+  }
+  .prepare-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .prepare-footer > button {
+    width: 100%;
+  }
+}
+@media (max-height: 600px) {
+  .mulligan .matchup {
+    display: none;
+  }
+  .prepare-footer {
+    flex-direction: row;
+    padding-top: 6px;
+  }
+  .prepare-footer > button {
+    width: auto;
+  }
+}

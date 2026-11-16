@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "volt-ui": {
+      "type": "http",
+      "url": "https://voltui.dev/api/mcp"
+    }
+  }
+}

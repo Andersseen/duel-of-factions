@@ -1,214 +1,335 @@
 <div id="app">
   <div class="game-controls">
-    <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
+    <button
+      voltButton
+      size="icon"
+      variant="outline"
+      moveWhileHover="lift"
+      moveWhileTap="press"
       class="settings-button"
       (click)="act('settings')"
       [attr.aria-label]="c.t('settings')"
+      [qzTooltip]="c.t('settings')"
+      tooltipPlacement="left"
+      [tooltipDisabled]="c.modal !== null"
     >
-      ⚙
+      <lmn-settings [size]="20" />
     </button>
   </div>
-  @switch(c.screen){ @case('menu'){
-  <main class="menu" [move]="'fade-up'">
+
+  @switch (c.screen) { @case ("menu") {
+  <main class="menu" move="fade-up">
     <div class="menu-copy">
-      <div class="eyebrow">{{c.t('solo')}}</div>
+      <div class="eyebrow">{{ c.t("solo") }}</div>
       <h1>
-        {{['Duelo de','Двобій','Duel of'][c.lang]}}<br /><em
-          >{{['Facciones.','фракцій.','Factions.'][c.lang]}}</em
+        {{ ["Duelo de", "Двобій", "Duel of"][c.lang] }}<br /><em
+          >{{ ["Facciones.", "фракцій.", "Factions."][c.lang] }}</em
         >
       </h1>
-      <p>{{c.t('intro')}}</p>
+      <p>{{ c.t("intro") }}</p>
       <div class="menu-actions">
-        <button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('new')">{{c.t('play')}} ↗</button
-        ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('settings')">
-          {{c.t('settings')}}
+        <button
+          voltButton
+          size="lg"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          (click)="act('new')"
+        >
+          {{ c.t("play") }} <lmn-arrow-up-right [size]="16" />
+        </button>
+        <button
+          voltButton
+          size="lg"
+          variant="outline"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          (click)="act('settings')"
+        >
+          <lmn-settings [size]="16" /> {{ c.t("settings") }}
         </button>
       </div>
-      <div class="menu-notes">{{c.t('local')}}</div>
+      <div class="menu-notes">{{ c.t("local") }}</div>
     </div>
-    <div class="menu-art">
-      @for(f of ['forest','granite'];track f){
-      <div class="hero-card">
+    @if (showMenuArt()) {
+    <div class="menu-art" aria-hidden="true">
+      @for (f of ["forest", "granite"]; track f; let i = $index) {
+      <figure
+        class="hero-card"
+        [move]="i === 0 ? 'fade-right' : 'fade-left'"
+        [moveDelay]="120 + i * 120"
+      >
         <div [gamePortrait]="c.E.LEADER_ART[f]"></div>
-        <div class="hero-caption">{{c.t(f)}}</div>
-      </div>
+        <figcaption class="hero-caption">{{ c.t(f) }}</figcaption>
+      </figure>
       }
-      <div class="vs-seal">VS</div>
+      <div class="vs-seal" move="zoom-in" [moveDelay]="420">VS</div>
     </div>
+    }
   </main>
-  } @case('faction'){
-  <main class="page faction-page" [move]="'fade-up'">
-    <div class="page-title">
+  } @case ("faction") {
+  <main class="page faction-page" move="fade-up">
+    <header class="page-title">
       <div>
-        <div class="eyebrow">{{c.t('factionStep')}}</div>
-        <h2>{{c.t('choose')}}</h2>
-        <p>{{c.t('chooseSub')}}</p>
+        <div class="eyebrow">{{ c.t("factionStep") }}</div>
+        <h2>{{ c.t("choose") }}</h2>
+        <p>{{ c.t("chooseSub") }}</p>
       </div>
-      <div class="steps">
-        @for(step of ['faction','deck','duel'];track step){<span
-          [class.active]="step==='faction'"
-          >{{c.t(step+'Step')}}</span
-        >}
-      </div>
-    </div>
-    @if(c.factionPages>1){
-    <div class="faction-pagination">
-      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-        class="ghost small"
+      <ol class="steps" [attr.aria-label]="c.t('factionStep')">
+        @for (step of ["faction", "deck", "duel"]; track step) {
+        <li
+          [class.active]="step === 'faction'"
+          [attr.aria-current]="step === 'faction' ? 'step' : null"
+        >
+          {{ c.t(step + "Step") }}
+        </li>
+        }
+      </ol>
+    </header>
+    @if (c.factionPages > 1) {
+    <div class="pager faction-pagination">
+      <button
+        voltButton
+        size="icon"
+        variant="outline"
         (click)="act('factions-prev')"
-        [disabled]="c.factionPage===0"
-        [moveDisabled]="c.factionPage===0"
+        [disabled]="c.factionPage === 0"
         [attr.aria-label]="c.t('previousFactions')"
+        [qzTooltip]="c.t('previousFactions')"
       >
-        ←</button
-      ><span>{{c.factionPage+1}} / {{c.factionPages}}</span
-      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-        class="ghost small"
+        <lmn-chevron-left [size]="16" />
+      </button>
+      <span>{{ c.factionPage + 1 }} / {{ c.factionPages }}</span>
+      <button
+        voltButton
+        size="icon"
+        variant="outline"
         (click)="act('factions-next')"
-        [disabled]="c.factionPage===c.factionPages-1"
-        [moveDisabled]="c.factionPage===c.factionPages-1"
+        [disabled]="c.factionPage === c.factionPages - 1"
         [attr.aria-label]="c.t('nextFactions')"
+        [qzTooltip]="c.t('nextFactions')"
       >
-        →
+        <lmn-chevron-right [size]="16" />
       </button>
     </div>
     }
-    <div class="faction-grid" [attr.data-count]="c.factions.length">
-      @for(f of c.factions;track f){
-      <article [class]="'faction-panel '+f">
+    <div
+      class="faction-grid"
+      [attr.data-count]="c.factions.length"
+      moveStagger
+      moveStaggerStep="70ms"
+    >
+      @for (f of c.factions; track f) {
+      <volt-card
+        class="faction-panel"
+        [attr.data-faction]="f"
+        moveInView="fade-up"
+      >
         <div [gamePortrait]="c.E.LEADER_ART[f]" [contain]="true"></div>
         <div class="faction-info">
-          <div class="eyebrow">{{c.emblems[f]}} {{c.t(f+'Leader')}}</div>
-          <h3>{{c.t(f)}}</h3>
-          <p>{{c.t(f+'Desc')}}</p>
-          <div class="trait">{{c.t(f+'Trait')}}</div>
-          <button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('faction',{faction:f})">
-            {{c.t('selectFaction')}} →
+          <div class="eyebrow">{{ c.emblems[f] }} {{ c.t(f + "Leader") }}</div>
+          <h3>{{ c.t(f) }}</h3>
+          <p>{{ c.t(f + "Desc") }}</p>
+          <div class="trait">{{ c.t(f + "Trait") }}</div>
+          <button
+            voltButton
+            moveWhileHover="lift"
+            moveWhileTap="press"
+            (click)="act('faction', { faction: f })"
+          >
+            {{ c.t("selectFaction") }} <lmn-arrow-right [size]="16" />
           </button>
         </div>
-      </article>
+      </volt-card>
       }
     </div>
   </main>
-  } @case('deck'){
+  } @case ("deck") {
   <game-deck-builder />
-  } @case('prepare'){ @if(c.game;as game){
-  <main class="page mulligan" [move]="'fade-up'">
-    <div class="page-title">
+  } @case ("prepare") { @if (c.game; as game) {
+  <main class="page mulligan" move="fade-up">
+    <header class="page-title">
       <div>
-        <div class="eyebrow">{{c.t(game.difficulty)}}</div>
-        <h2>{{c.t('initialHand')}}</h2>
+        <div class="eyebrow">{{ c.t(game.difficulty) }}</div>
+        <h2>{{ c.t("initialHand") }}</h2>
       </div>
-      <button voltButton
+      <button
+        voltButton
         variant="ghost"
         size="icon"
-        class="ghost small info-button"
+        class="info-button"
         (click)="act('prepare-help')"
-        [aria-label]="c.t('help')"
+        [attr.aria-label]="c.t('help')"
+        [qzTooltip]="c.t('help')"
       >
-        ?
+        <lmn-question-mark-circle [size]="20" />
       </button>
-    </div>
+    </header>
     <div class="matchup">
-      <div class="avatar" [gamePortrait]="c.E.LEADER_ART[c.faction]"></div>
-      <span>{{c.t(c.faction)}} <b>vs</b> {{c.t(game.players[1].f)}}</span>
-      <div
-        class="avatar"
-        [gamePortrait]="c.E.LEADER_ART[game.players[1].f]"
-      ></div>
+      <volt-avatar class="avatar"
+        ><span [gamePortrait]="c.E.LEADER_ART[c.faction]"></span
+      ></volt-avatar>
+      <span>{{ c.t(c.faction) }} <b>vs</b> {{ c.t(game.players[1].f) }}</span>
+      <volt-avatar class="avatar"
+        ><span [gamePortrait]="c.E.LEADER_ART[game.players[1].f]"></span
+      ></volt-avatar>
     </div>
-    <div class="starting-hand" [style.--shown]="c.startingHand.length">
-      @for(card of c.startingHand;track card.uid){
-      <div [class.swap-used]="c.swapped.has(card.uid)">
+    <div
+      class="starting-hand"
+      [style.--shown]="c.startingHand.length"
+      moveStagger
+      moveStaggerStep="60ms"
+    >
+      @for (card of c.startingHand; track card.uid) {
+      <div
+        class="starting-card"
+        [class.swap-used]="c.swapped.has(card.uid)"
+        moveInView="flip-y"
+      >
         <button
           [gameCard]="card"
-          [moveWhileHover]="'lift'"
-          [moveWhileTap]="'press'"
-          (click)="act('swap-preview',{uid:card.uid})"
-        ></button
-        >@if(c.swapped.has(card.uid)){
-        <div class="swap-mark">↻ {{c.t('changed')}}</div>
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          (click)="act('swap-preview', { uid: card.uid })"
+        ></button>
+        @if (c.swapped.has(card.uid)) {
+        <volt-badge class="swap-mark" variant="secondary" move="zoom-in"
+          ><lmn-arrow-path [size]="12" /> {{ c.t("changed") }}</volt-badge
+        >
         }
       </div>
       }
     </div>
-    @if(c.preparePages>1){
-    <div class="prepare-pagination">
-      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-        class="ghost"
+    @if (c.preparePages > 1) {
+    <div class="pager prepare-pagination">
+      <button
+        voltButton
+        size="icon"
+        variant="outline"
         (click)="act('prepare-prev')"
-        [disabled]="c.preparePage===0"
-        [moveDisabled]="c.preparePage===0"
+        [disabled]="c.preparePage === 0"
         [attr.aria-label]="c.t('previousCards')"
+        [qzTooltip]="c.t('previousCards')"
       >
-        ‹</button
-      ><span>{{c.preparePage+1}} / {{c.preparePages}}</span
-      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-        class="ghost"
+        <lmn-chevron-left [size]="16" />
+      </button>
+      <span>{{ c.preparePage + 1 }} / {{ c.preparePages }}</span>
+      <button
+        voltButton
+        size="icon"
+        variant="outline"
         (click)="act('prepare-next')"
-        [disabled]="c.preparePage===c.preparePages-1"
-        [moveDisabled]="c.preparePage===c.preparePages-1"
+        [disabled]="c.preparePage === c.preparePages - 1"
         [attr.aria-label]="c.t('nextCards')"
+        [qzTooltip]="c.t('nextCards')"
       >
-        ›
+        <lmn-chevron-right [size]="16" />
       </button>
     </div>
     }
-    <div class="prepare-footer">
-      <span>{{c.t('exchanges')}}: <b>{{2-c.swaps}} / 2</b></span
-      ><button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('begin')">
-        {{c.t('begin')}} →
+    <footer class="prepare-footer">
+      <span class="exchanges"
+        ><lmn-arrow-path [size]="14" /> {{ c.t("exchanges") }}:
+        <b [gameBump]="c.swaps">{{ 2 - c.swaps }} / 2</b></span
+      >
+      <button
+        voltButton
+        size="lg"
+        moveWhileHover="lift"
+        moveWhileTap="press"
+        (click)="act('begin')"
+      >
+        {{ c.t("begin") }} <lmn-arrow-right [size]="16" />
       </button>
-    </div>
+    </footer>
   </main>
-  } } @case('battle'){ @if(c.game;as game){
+  } } @case ("battle") { @if (c.game) {
   <game-battlefield />
-  } } @case('result'){ @if(c.game;as game){
-  <main class="result" [move]="'fade-up'">
-    <volt-badge variant="outline" class="badge">{{c.t('finished')}}</volt-badge>
-    <h1>
-      {{c.t(game.winner===null?'draw':game.winner===0?'victory':'defeat')}}
+  } } @case ("result") { @if (c.game; as game) { @let outcome = game.winner ===
+  null ? "draw" : game.winner === 0 ? "victory" : "defeat";
+  <main class="result" [attr.data-outcome]="outcome" move="fade-up">
+    <volt-badge variant="outline" class="result-badge">
+      @switch (outcome) { @case ("victory") {
+      <lmn-trophy [size]="14" />
+      } @case ("defeat") {
+      <lmn-flag [size]="14" />
+      } @default {
+      <lmn-scale [size]="14" />
+      } } {{ c.t("finished") }}
+    </volt-badge>
+    <h1 [move]="outcome === 'victory' ? 'tada' : 'fade-up'">
+      {{ c.t(outcome) }}
     </h1>
-    <p class="muted">
-      {{c.t(game.winner===null?'drawSub':game.winner===0?'victorySub':'defeatSub')}}
-    </p>
+    <p class="muted">{{ c.t(outcome + "Sub") }}</p>
     <div class="matchup">
-      <div class="avatar" [gamePortrait]="c.E.LEADER_ART[c.faction]"></div>
+      <volt-avatar class="avatar"
+        ><span [gamePortrait]="c.E.LEADER_ART[c.faction]"></span
+      ></volt-avatar>
       <div>
-        <div class="eyebrow">{{c.t('roundsWon')}}</div>
-        <div class="res-score">
-          {{game.players[0].wins}} : {{game.players[1].wins}}
+        <div class="eyebrow">{{ c.t("roundsWon") }}</div>
+        <div class="res-score" move="bounce-in">
+          {{ game.players[0].wins }} : {{ game.players[1].wins }}
         </div>
       </div>
-      <div
-        class="avatar"
-        [gamePortrait]="c.E.LEADER_ART[game.players[1].f]"
-      ></div>
+      <volt-avatar class="avatar"
+        ><span [gamePortrait]="c.E.LEADER_ART[game.players[1].f]"></span
+      ></volt-avatar>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>{{c.t('round')}}</th>
-          <th>{{c.t(c.faction)}} · {{c.t('you')}}</th>
-          <th>{{c.t(game.players[1].f)}} · {{c.t('rival')}}</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for(score of game.history;track $index){
-        <tr>
-          <td>0{{$index+1}}</td>
-          <td [class.winner]="score[0]>=score[1]">{{score[0]}}</td>
-          <td [class.winner]="score[1]>=score[0]">{{score[1]}}</td>
-        </tr>
+    <volt-table class="result-table">
+      <volt-table-header>
+        <volt-table-row>
+          <volt-table-head>{{ c.t("round") }}</volt-table-head>
+          <volt-table-head
+            >{{ c.t(c.faction) }} · {{ c.t("you") }}</volt-table-head
+          >
+          <volt-table-head
+            >{{ c.t(game.players[1].f) }} · {{ c.t("rival") }}</volt-table-head
+          >
+        </volt-table-row>
+      </volt-table-header>
+      <volt-table-body>
+        @for (score of game.history; track $index) {
+        <volt-table-row>
+          <volt-table-cell>0{{ $index + 1 }}</volt-table-cell>
+          <volt-table-cell [class.winner]="score[0] >= score[1]"
+            >{{ score[0] }}</volt-table-cell
+          >
+          <volt-table-cell [class.winner]="score[1] >= score[0]"
+            >{{ score[1] }}</volt-table-cell
+          >
+        </volt-table-row>
         }
-      </tbody>
-    </table>
+      </volt-table-body>
+    </volt-table>
     <div class="modal-actions">
-      <button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('rematch')">
-        {{c.t('rematch')}} ↻</button
-      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('change-deck')">
-        {{c.t('changeDeck')}}</button
-      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('menu')">{{c.t('menu')}}</button>
+      <button
+        voltButton
+        size="lg"
+        moveWhileHover="lift"
+        moveWhileTap="press"
+        (click)="act('rematch')"
+      >
+        <lmn-arrow-path [size]="16" /> {{ c.t("rematch") }}
+      </button>
+      <button
+        voltButton
+        size="lg"
+        variant="outline"
+        moveWhileHover="lift"
+        moveWhileTap="press"
+        (click)="act('change-deck')"
+      >
+        <lmn-squares-2x2 [size]="16" /> {{ c.t("changeDeck") }}
+      </button>
+      <button
+        voltButton
+        size="lg"
+        variant="ghost"
+        moveWhileHover="lift"
+        moveWhileTap="press"
+        (click)="act('menu')"
+      >
+        <lmn-home [size]="16" /> {{ c.t("menu") }}
+      </button>
     </div>
   </main>
   } } }

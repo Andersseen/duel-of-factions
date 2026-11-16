@@ -3,8 +3,11 @@ import {
   signal,
   computed,
   DestroyRef,
+  effect,
   inject,
+  untracked,
 } from "@angular/core";
+import { ViewportService } from "@quartz-headless/core";
 import * as E from "./engine";
 import type {
   GameState,
@@ -40,7 +43,17 @@ const save = (k: string, v: unknown) => {
     localStorage.setItem(k, JSON.stringify(v));
   } catch {}
 };
-export function createGameController() {
+/** Reactive viewport size. In the app it is Quartz's `ViewportService`. */
+export interface ViewportSize {
+  readonly width: () => number;
+  readonly height: () => number;
+}
+export function createGameController(viewport?: ViewportSize) {
+  // Without an injected viewport (engine tests, plain scripts) fall back to window events.
+  const ownViewport = viewport
+    ? null
+    : { width: signal(window.innerWidth), height: signal(window.innerHeight) };
+  const vp: ViewportSize = viewport ?? ownViewport!;
   const revision = signal(0);
   let lang = read("df-lang", 0),
     faction = read("df-faction", "forest"),
@@ -57,9 +70,7 @@ export function createGameController() {
     aiTimer: ReturnType<typeof setTimeout> | null = null;
   let preparePage = 0,
     handPage = 0,
-    factionPage = 0,
-    width = window.innerWidth,
-    height = window.innerHeight;
+    factionPage = 0;
   let difficulty = read("df-difficulty", "normal");
   if (!E.DIFFICULTIES.includes(difficulty)) difficulty = "normal";
   if (![0, 1, 2].includes(lang)) lang = 0;
@@ -377,8 +388,8 @@ export function createGameController() {
   }
 
   function resize() {
-    width = window.innerWidth;
-    height = window.innerHeight;
+    ownViewport?.width.set(window.innerWidth);
+    ownViewport?.height.set(window.innerHeight);
     preparePage = 0;
     handPage = 0;
     factionPage = 0;
@@ -387,7 +398,7 @@ export function createGameController() {
   function visibility() {
     audio.setActive(!document.hidden);
   }
-  window.addEventListener("resize", resize);
+  if (ownViewport) window.addEventListener("resize", resize);
   document.addEventListener("visibilitychange", visibility);
   render();
   const filters = [
@@ -456,6 +467,11 @@ export function createGameController() {
     t,
     name,
     ab,
+    /** Localised name of an ability key (horn, medic, spy…). */
+    abilityName: (key: string) => {
+      revision();
+      return AB[key]?.[lang] ?? key;
+    },
     definition,
     deck,
     action,
@@ -566,11 +582,11 @@ export function createGameController() {
     },
     get factionPages() {
       revision();
-      return width < 700 || height < 650 ? 2 : 1;
+      return vp.width() < 700 || vp.height() < 650 ? 2 : 1;
     },
     get factions() {
       revision();
-      const size = width < 700 || height < 650 ? 2 : 4;
+      const size = vp.width() < 700 || vp.height() < 650 ? 2 : 4;
       return E.FACTIONS.slice(factionPage * size, (factionPage + 1) * size);
     },
     get preparePage() {
@@ -581,12 +597,12 @@ export function createGameController() {
       revision();
       return Math.ceil(
         (game?.players[0].hand.length ?? 1) /
-          (width < 360 ? 2 : width < 700 ? 3 : 10),
+          (vp.width() < 360 ? 2 : vp.width() < 700 ? 3 : 10),
       );
     },
     get startingHand() {
       revision();
-      const size = width < 360 ? 2 : width < 700 ? 3 : 10;
+      const size = vp.width() < 360 ? 2 : vp.width() < 700 ? 3 : 10;
       return (
         game?.players[0].hand.slice(
           preparePage * size,
@@ -604,13 +620,13 @@ export function createGameController() {
         1,
         Math.ceil(
           (game?.players[0].hand.length ?? 0) /
-            (width < 650 ? 3 : width < 1000 ? 6 : 10),
+            (vp.width() < 650 ? 3 : vp.width() < 1000 ? 6 : 10),
         ),
       );
     },
     get hand() {
       revision();
-      const size = width < 650 ? 3 : width < 1000 ? 6 : 10;
+      const size = vp.width() < 650 ? 3 : vp.width() < 1000 ? 6 : 10;
       handPage = Math.min(
         handPage,
         Math.max(0, Math.ceil((game?.players[0].hand.length ?? 0) / size) - 1),
@@ -681,10 +697,12 @@ export function createGameController() {
           ...(target === undefined ? {} : { target }),
         });
     },
+    /** Called when an injected viewport changes size: pagination restarts. */
+    viewportChanged: resize,
     destroy() {
       clearTimeout(aiTimer ?? undefined);
       audio.destroy();
-      window.removeEventListener("resize", resize);
+      if (ownViewport) window.removeEventListener("resize", resize);
       document.removeEventListener("visibilitychange", visibility);
       delete document.body.dataset["screen"];
       delete document.body.dataset["theme"];
@@ -693,7 +711,7 @@ export function createGameController() {
 }
 @Injectable()
 export class GameStore {
-  readonly controller = createGameController();
+  readonly controller = createGameController(inject(ViewportService));
   readonly theme = computed(() => {
     this.controller.revision();
     return ["menu", "faction"].includes(this.controller.screen)
@@ -701,6 +719,14 @@ export class GameStore {
       : this.controller.faction;
   });
   constructor() {
+    const viewport = inject(ViewportService);
+    let first = true;
+    effect(() => {
+      viewport.width();
+      viewport.height();
+      if (first) first = false;
+      else untracked(() => this.controller.viewportChanged());
+    });
     inject(DestroyRef).onDestroy(() => this.controller.destroy());
   }
 }

@@ -3,38 +3,92 @@ import {
   DraggableDirective,
   DropZoneDirective,
   QzDropInfo,
+  ViewportService,
 } from "@quartz-headless/core";
+import { TooltipDirective } from "@quartz-headless/primitives";
+import {
+  VoltAvatar,
+  VoltBadge,
+  VoltCard,
+  VoltNativeButton,
+} from "@voltui/components";
 import {
   MoveAnimateDirective,
-  MoveLoopDirective,
   MoveHoverDirective,
+  MoveLoopDirective,
   MoveTapDirective,
 } from "angular-movement";
-import { VoltNativeButton } from "@voltui/components";
+import { LmnArchiveBoxIcon } from "lumen-icons/archive-box";
+import { LmnChevronLeftIcon } from "lumen-icons/chevron-left";
+import { LmnChevronRightIcon } from "lumen-icons/chevron-right";
+import { LmnHandRaisedIcon } from "lumen-icons/hand-raised";
+import { LmnInformationCircleIcon } from "lumen-icons/information-circle";
+import { LmnMegaphoneIcon } from "lumen-icons/megaphone";
+import { LmnPlusIcon } from "lumen-icons/plus";
+import { LmnRectangleStackIcon } from "lumen-icons/rectangle-stack";
+import { LmnSparklesIcon } from "lumen-icons/sparkles";
+import { LmnStarIcon } from "lumen-icons/star";
+import { LmnSunIcon } from "lumen-icons/sun";
+import { LmnXMarkIcon } from "lumen-icons/x-mark";
 import { GameStore } from "../game.store";
+import { BumpDirective } from "../motion/bump.directive";
 import { CardComponent } from "./card.component";
 import { DetailComponent } from "./detail.component";
 import { PortraitComponent } from "./portrait.component";
 
+/**
+ * The match board. Library roles:
+ * - Volt: panels, badges, avatars and every UI button.
+ * - Quartz: drag & drop from hand to rows (`qzDraggable` / `qzDropZone`) and tooltips.
+ * - Movement: enter/hover/tap motion and the score bump (`gameBump` over `MoveAnimator`).
+ * - Lumen: every UI glyph.
+ */
 @Component({
   selector: "game-battlefield",
   imports: [
     CardComponent,
     DetailComponent,
     PortraitComponent,
-    MoveAnimateDirective,
-    MoveLoopDirective,
-    MoveHoverDirective,
-    MoveTapDirective,
+    BumpDirective,
     DraggableDirective,
     DropZoneDirective,
+    TooltipDirective,
+    VoltAvatar,
+    VoltBadge,
+    VoltCard,
     VoltNativeButton,
+    MoveAnimateDirective,
+    MoveHoverDirective,
+    MoveLoopDirective,
+    MoveTapDirective,
+    LmnArchiveBoxIcon,
+    LmnChevronLeftIcon,
+    LmnChevronRightIcon,
+    LmnHandRaisedIcon,
+    LmnInformationCircleIcon,
+    LmnMegaphoneIcon,
+    LmnPlusIcon,
+    LmnRectangleStackIcon,
+    LmnSparklesIcon,
+    LmnStarIcon,
+    LmnSunIcon,
+    LmnXMarkIcon,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./battlefield.html",
 })
 export class BattlefieldComponent {
   readonly c = inject(GameStore).controller;
+  /**
+   * The inspector column only exists on wide screens. It is not rendered at all below that
+   * (rather than hidden with CSS), so its Movement animations never run on detached boxes.
+   */
+  readonly #viewport = inject(ViewportService);
+  readonly showInspector = this.#viewport.observe("(min-width: 1101px)");
+  /** The move log needs vertical room as well. */
+  readonly showLog = this.#viewport.observe(
+    "(min-width: 1101px) and (min-height: 731px)",
+  );
 
   act(action: string, data: Record<string, string | number> = {}) {
     this.c.action(

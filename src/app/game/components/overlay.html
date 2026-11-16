@@ -1,239 +1,345 @@
-<ng-template #dialogTemplate let-ref let-labelledBy="ariaLabelledBy">
-  @if(c.modal||c.roundNotice||(c.screen==='battle'&&c.game?.pending?.side===0)){
-  <section class="modal" [move]="'fade-up'">
-    <h2 class="sr-only" [id]="labelledBy">{{dialogTitle()}}</h2>
-    @switch(c.modal){ @case('settings'){
-    <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-      class="ghost small close"
+<ng-template
+  voltDialogRoot
+  [open]="isOpen()"
+  (openChange)="onOpenChange($event)"
+  [dismissible]="closable()"
+  [role]="alert() ? 'alertdialog' : 'dialog'"
+  initialFocus="[data-safe]"
+>
+  <div voltDialogOverlay class="game-dialog-backdrop"></div>
+  <!-- Volt owns the dialog's centering (translate) and its enter/exit animation. -->
+  <section voltDialogContent class="modal" [attr.data-kind]="kind()">
+    @if (closable()) {
+    <button
+      voltButton
+      size="icon"
+      variant="ghost"
+      class="dialog-close"
+      data-safe
       (click)="act('close')"
       [attr.aria-label]="c.t('close')"
     >
-      ×
+      <lmn-x-mark />
     </button>
-    <div class="eyebrow">{{c.t('title')}}</div>
-    <h2>{{c.t('settings')}}</h2>
-    <div class="settings-rows">
-      <fieldset class="difficulty-picker">
-        <legend>{{c.t('difficulty')}}</legend>
-        <div>
-          @for(d of c.E.DIFFICULTIES;track d){<button voltButton [variant]="c.difficulty===d?'solid':'ghost'" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-            [class]="'small '+(c.difficulty===d?'active':'ghost')"
-            (click)="act('difficulty',{level:d})"
-            [attr.aria-pressed]="c.difficulty===d"
-          >
-            {{c.t(d)}}</button
-          >}
-        </div>
-        <p>{{c.t('difficultyHint')}}</p>
-      </fieldset>
-      @if(c.screen==='battle'||c.screen==='prepare'){
-      <p class="notice">{{c.t('nextDifficulty')}}</p>
+    }
+    <div class="modal-body">
+      @if (eyebrow(); as text) {
+      <div class="eyebrow">{{ text }}</div>
       }
-      <div class="setting-row">
-        <span>{{c.t('language')}}</span>
-        <div class="language-options">
-          @for(label of ['Español','Українська','English'];track $index){<button voltButton [variant]="c.lang===$index?'solid':'ghost'" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-            [class]="c.lang===$index?'primary':'ghost'"
-            (click)="act('lang',{lang:$index})"
-            [attr.aria-pressed]="c.lang===$index"
-          >
-            {{label}}</button
-          >}
-        </div>
-      </div>
-      <div class="setting-row">
-        <span>{{c.t('music')}}</span
-        ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-          qzSwitch
-          [attr.aria-label]="c.t('music')"
-          [checked]="c.soundSettings.music"
-          (checkedChange)="act('music')"
-        >
-          {{c.t(c.soundSettings.music?'on':'off')}}
-        </button>
-      </div>
-      <div class="setting-row">
-        <span>{{c.t('effects')}}</span
-        ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-          qzSwitch
-          [attr.aria-label]="c.t('effects')"
-          [checked]="c.soundSettings.effects"
-          (checkedChange)="act('effects')"
-        >
-          {{c.t(c.soundSettings.effects?'on':'off')}}
-        </button>
-      </div>
-      <label class="setting-row"
-        ><span>{{c.t('volume')}}</span
-        ><input
-          type="range"
-          min="0"
-          max="100"
-          [value]="c.soundSettings.volume*100"
-          (input)="volume($event)"
-          [attr.aria-label]="c.t('volume')"
-      /></label>
-      <div class="setting-row">
-        <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('help')">{{c.t('help')}}</button
-        ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('audio-test')">
-          {{c.t('audioTest')}}
-        </button>
-      </div>
-      @if(c.fullscreenEnabled){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-        class="ghost"
-        (click)="act('fullscreen')"
-      >
-        {{c.t(c.fullscreen?'exitFullscreen':'fullscreen')}}</button
-      >}
-    </div>
-    <p class="notice">{{c.t('settingsHint')}}</p>
-    <div class="modal-actions">
-      <button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('close')">{{c.t('resume')}}</button
-      >@if(c.screen!=='menu'){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('menu')">
-        {{c.t('menu')}}</button
-      >}
-    </div>
-    } @case('deck-help'){
-    <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-      class="ghost small close"
-      (click)="act('close')"
-      [attr.aria-label]="c.t('close')"
-    >
-      ×
-    </button>
-    <h2>{{c.t('deckInfo')}}</h2>
-    <p>{{c.t('deckGuide')}}</p>
-    <p>{{c.t('unitMin')}} · {{c.t('specialMax')}}</p>
-    <h3>{{c.t(c.faction+'Leader')}}</h3>
-    <p>{{c.t(c.faction+'LeaderDesc')}}</p>
-    <div class="modal-actions">
-      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('restore')">{{c.t('restore')}}</button
-      ><button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('close')">{{c.t('close')}}</button>
-    </div>
-    } @case('prepare-help'){
-    <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-      class="ghost small close"
-      (click)="act('close')"
-      [attr.aria-label]="c.t('close')"
-    >
-      ×
-    </button>
-    <h2>{{c.t('initialHand')}}</h2>
-    <p>{{c.t('prepareSub')}}</p>
-    <p>{{c.t('swapAgain')}}</p>
-    } @case('help'){
-    <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-      class="ghost small close"
-      (click)="act('close')"
-      [attr.aria-label]="c.t('close')"
-    >
-      ×
-    </button>
-    <div class="eyebrow">{{c.t('title')}}</div>
-    <h2>{{c.t('help')}}</h2>
-    <div class="rules-grid">
-      @for(i of [1,2,3,4];track i){
-      <div class="rule">
-        <strong>0{{i}} · {{c.t('rules'+i)}}</strong>{{c.t('rules'+i+'b')}}
-      </div>
-      }
-    </div>
-    <p class="notice">{{c.t('rulesNote')}}</p>
-    } @case('quit'){
-    <h2>{{c.t('quitTitle')}}</h2>
-    <p>{{c.t('quitBody')}}</p>
-    <div class="modal-actions">
-      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('close')">{{c.t('stay')}}</button
-      ><button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('quit')">{{c.t('menu')}}</button>
-    </div>
-    } @case('pass'){
-    <h2>{{c.t('confirmPass')}}</h2>
-    <p>{{c.t('confirmPassBody')}}</p>
-    <div class="modal-actions">
-      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('close')">
-        {{c.t('cancelButton')}}</button
-      ><button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('confirm-pass')">
-        {{c.t('pass')}}
-      </button>
-    </div>
-    } @default{ @if(c.inspectId;as id){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-      class="ghost small close"
-      (click)="act('close')"
-      [attr.aria-label]="c.t('close')"
-    >
-      ×
-    </button>
-    <div class="detail" style="max-width: 260px; margin: auto">
-      <game-detail [id]="id" [large]="true" />
-    </div>
-    @if(c.swapUid!==undefined){
-    <div class="modal-actions">
-      <button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-        class="primary"
-        (click)="act('swap',{uid:c.swapUid!})"
-        [disabled]="c.swaps>=2||c.swapped.has(c.swapUid!)"
-        [moveDisabled]="c.swaps>=2||c.swapped.has(c.swapUid!)"
-      >
-        {{c.t('exchangeCard')}}</button
-      ><button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('close')">
-        {{c.t('cancelButton')}}
-      </button>
-    </div>
-    }} @else if(c.graveSide!==undefined){<button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'"
-      class="ghost small close"
-      (click)="act('close')"
-      [attr.aria-label]="c.t('close')"
-    >
-      ×
-    </button>
-    <h2>{{c.t('grave')}} · {{c.t(c.graveSide?'rival':'you')}}</h2>
-    <div class="grave-grid">
-      @for(card of c.game!.players[c.graveSide!].grave;track card.uid){<button
-        [gameCard]="card"
-        [moveWhileHover]="'lift'"
-        [moveWhileTap]="'press'"
-        (click)="act('inspect',{id:card.id})"
-      ></button
-      >}@empty{
-      <p>{{c.t('emptyGrave')}}</p>
-      }
-    </div>
-    } @else if(c.roundNotice;as score){
-    <div class="round-banner">
-      <div class="eyebrow">{{c.t('roundEnd')}}</div>
-      <h2>
-        {{c.t(score[0]===score[1]?'tieRound':score[0]>score[1]?'wonRound':'lostRound')}}
+      <h2 voltDialogTitle [class.sr-only]="kind() === 'inspect'">
+        {{ dialogTitle() }}
       </h2>
-      <div class="res-score">{{score[0]}} : {{score[1]}}</div>
-      <p>{{c.t(score[0]===score[1]?'tieExplain':'nextExplain')}}</p>
-      @if(score[0]===score[1]){
-      <p>{{c.t('nextExplain')}}</p>
+      <p voltDialogDescription [class.sr-only]="!descriptionVisible()">
+        {{ dialogDescription() }}
+      </p>
+
+      @switch (kind()) { @case ("settings") {
+      <div class="settings-rows">
+        <fieldset class="setting-block">
+          <legend>{{ c.t("difficulty") }}</legend>
+          <volt-radio-group
+            class="option-group"
+            orientation="horizontal"
+            [value]="c.difficulty"
+            (valueChange)="chooseDifficulty($event)"
+            [attr.aria-label]="c.t('difficulty')"
+          >
+            @for (d of c.E.DIFFICULTIES; track d) {
+            <volt-radio-item [value]="d">{{ c.t(d) }}</volt-radio-item>
+            }
+          </volt-radio-group>
+          <p class="setting-hint">{{ c.t("difficultyHint") }}</p>
+          @if (c.screen === "battle" || c.screen === "prepare") {
+          <volt-badge variant="outline" class="setting-note">
+            <lmn-information-circle [size]="12" />
+            {{ c.t("nextDifficulty") }}
+          </volt-badge>
+          }
+        </fieldset>
+        <div class="setting-row">
+          <span id="setting-language">{{ c.t("language") }}</span>
+          <volt-radio-group
+            class="option-group"
+            orientation="horizontal"
+            [value]="'' + c.lang"
+            (valueChange)="chooseLanguage($event)"
+            aria-labelledby="setting-language"
+          >
+            @for (label of languages; track $index) {
+            <volt-radio-item [value]="'' + $index">{{ label }}</volt-radio-item>
+            }
+          </volt-radio-group>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label"
+            ><lmn-musical-note [size]="16" /> {{ c.t("music") }}</span
+          >
+          <volt-switch
+            [checked]="c.soundSettings.music"
+            (checkedChange)="act('music')"
+            [aria-label]="c.t('music')"
+          />
+        </div>
+        <div class="setting-row">
+          <span class="setting-label"
+            ><lmn-speaker-wave [size]="16" /> {{ c.t("effects") }}</span
+          >
+          <volt-switch
+            [checked]="c.soundSettings.effects"
+            (checkedChange)="act('effects')"
+            [aria-label]="c.t('effects')"
+          />
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">{{ c.t("volume") }}</span>
+          <volt-slider
+            class="setting-slider"
+            [min]="0"
+            [max]="100"
+            [step]="1"
+            [value]="c.soundSettings.volume * 100"
+            (valueChange)="volume($event)"
+            [ariaLabel]="c.t('volume')"
+          />
+        </div>
+        <div class="setting-actions">
+          <button
+            voltButton
+            variant="outline"
+            size="sm"
+            moveWhileHover="lift"
+            moveWhileTap="press"
+            (click)="act('help')"
+          >
+            <lmn-book-open [size]="16" /> {{ c.t("help") }}
+          </button>
+          <button
+            voltButton
+            variant="outline"
+            size="sm"
+            moveWhileHover="lift"
+            moveWhileTap="press"
+            (click)="act('audio-test')"
+          >
+            <lmn-speaker-wave [size]="16" /> {{ c.t("audioTest") }}
+          </button>
+          @if (c.fullscreenEnabled) {
+          <button
+            voltButton
+            variant="outline"
+            size="sm"
+            moveWhileHover="lift"
+            moveWhileTap="press"
+            (click)="act('fullscreen')"
+          >
+            @if (c.fullscreen) {
+            <lmn-arrows-pointing-in [size]="16" />
+            } @else {
+            <lmn-arrows-pointing-out [size]="16" />
+            } {{ c.t(c.fullscreen ? "exitFullscreen" : "fullscreen") }}
+          </button>
+          }
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button
+          voltButton
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          data-safe
+          (click)="act('close')"
+        >
+          {{ c.t("resume") }}
+        </button>
+        @if (c.screen !== "menu") {
+        <button
+          voltButton
+          variant="ghost"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          (click)="act('menu')"
+        >
+          <lmn-home [size]="16" /> {{ c.t("menu") }}
+        </button>
+        }
+      </div>
+      } @case ("deck-help") {
+      <p>{{ c.t("unitMin") }} · {{ c.t("specialMax") }}</p>
+      <volt-card class="leader-note">
+        <volt-avatar class="avatar"
+          ><span [gamePortrait]="c.E.LEADER_ART[c.faction]"></span
+        ></volt-avatar>
+        <div>
+          <h3>{{ c.t(c.faction + "Leader") }}</h3>
+          <p>{{ c.t(c.faction + "LeaderDesc") }}</p>
+        </div>
+      </volt-card>
+      <div class="modal-actions">
+        <button
+          voltButton
+          variant="outline"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          (click)="act('restore')"
+        >
+          <lmn-arrow-path [size]="16" /> {{ c.t("restore") }}
+        </button>
+        <button
+          voltButton
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          data-safe
+          (click)="act('close')"
+        >
+          {{ c.t("close") }}
+        </button>
+      </div>
+      } @case ("prepare-help") {
+      <p>{{ c.t("swapAgain") }}</p>
+      } @case ("help") {
+      <ol class="rules-grid">
+        @for (i of [1, 2, 3, 4]; track i) {
+        <li class="rule">
+          <strong>0{{ i }} · {{ c.t("rules" + i) }}</strong>
+          {{ c.t("rules" + i + "b") }}
+        </li>
+        }
+      </ol>
+      <volt-alert variant="info" class="rules-note">
+        <lmn-information-circle slot="icon" [size]="20" />
+        <volt-alert-description>{{ c.t("rulesNote") }}</volt-alert-description>
+      </volt-alert>
+      } @case ("quit") {
+      <div class="modal-actions">
+        <button
+          voltButton
+          variant="ghost"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          data-safe
+          (click)="act('close')"
+        >
+          {{ c.t("stay") }}
+        </button>
+        <button
+          voltButton
+          variant="destructive"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          (click)="act('quit')"
+        >
+          <lmn-home [size]="16" /> {{ c.t("menu") }}
+        </button>
+      </div>
+      } @case ("pass") {
+      <div class="modal-actions">
+        <button
+          voltButton
+          variant="ghost"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          data-safe
+          (click)="act('close')"
+        >
+          {{ c.t("cancelButton") }}
+        </button>
+        <button
+          voltButton
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          (click)="act('confirm-pass')"
+        >
+          <lmn-hand-raised [size]="16" /> {{ c.t("pass") }}
+        </button>
+      </div>
+      } @case ("inspect") { @if (c.inspectId; as id) {
+      <volt-card class="detail detail-dialog">
+        <game-detail [id]="id" [large]="true" />
+      </volt-card>
+      @if (c.swapUid !== undefined) {
+      <div class="modal-actions">
+        <button
+          voltButton
+          variant="ghost"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          data-safe
+          (click)="act('close')"
+        >
+          {{ c.t("cancelButton") }}
+        </button>
+        <button
+          voltButton
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          (click)="act('swap', { uid: c.swapUid! })"
+          [disabled]="c.swaps >= 2 || c.swapped.has(c.swapUid!)"
+          [moveDisabled]="c.swaps >= 2 || c.swapped.has(c.swapUid!)"
+        >
+          <lmn-arrow-path [size]="16" /> {{ c.t("exchangeCard") }}
+        </button>
+      </div>
+      } } } @case ("grave") {
+      <div class="grave-grid">
+        @for ( card of c.game!.players[c.graveSide!].grave; track card.uid ) {
+        <button
+          [gameCard]="card"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          (click)="act('inspect', { id: card.id })"
+        ></button>
+        } @empty {
+        <volt-empty-state class="grave-empty">
+          <lmn-archive-box slot="icon" [size]="32" />
+          <volt-empty-state-description
+            >{{ c.t("emptyGrave") }}</volt-empty-state-description
+          >
+        </volt-empty-state>
+        }
+      </div>
+      } @case ("round") { @if (c.roundNotice; as score) {
+      <div class="res-score" move="bounce-in">
+        {{ score[0] }} : {{ score[1] }}
+      </div>
+      @if (score[0] === score[1]) {
+      <p>{{ c.t("nextExplain") }}</p>
       }
       <div class="modal-actions">
-        <button voltButton variant="solid" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="primary" (click)="act('next-round')">
-          {{c.t(c.game!.over?'finished':'continue')}} →
+        <button
+          voltButton
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          data-safe
+          (click)="act('next-round')"
+        >
+          {{ c.t(c.game!.over ? "finished" : "continue") }}
+          <lmn-arrow-right [size]="16" />
         </button>
       </div>
+      } } @case ("revive") {
+      <div class="grave-grid">
+        @for (card of c.E.eligible(c.game!.players[0]); track card.uid) {
+        <button
+          [gameCard]="card"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          (click)="act('revive', { uid: card.uid })"
+        ></button>
+        }
+      </div>
+      <div class="modal-actions">
+        <button
+          voltButton
+          variant="ghost"
+          moveWhileHover="lift"
+          moveWhileTap="press"
+          data-safe
+          (click)="act('skip-revive')"
+        >
+          {{ c.t("skip") }}
+        </button>
+      </div>
+      } }
     </div>
-    } @else if(c.game?.pending?.side===0){
-    <div class="eyebrow">{{c.t('revive')}}</div>
-    <h2>{{c.t('revive')}}</h2>
-    <p>{{c.t('reviveSub')}}</p>
-    <div class="grave-grid" style="margin-top: 20px">
-      @for(card of c.E.eligible(c.game!.players[0]);track card.uid){<button
-        [gameCard]="card"
-        [moveWhileHover]="'lift'"
-        [moveWhileTap]="'press'"
-        (click)="act('revive',{uid:card.uid})"
-      ></button
-      >}
-    </div>
-    <div class="modal-actions">
-      <button voltButton variant="ghost" [moveWhileHover]="'lift'" [moveWhileTap]="'press'" class="ghost" (click)="act('skip-revive')">
-        {{c.t('skip')}}
-      </button>
-    </div>
-    } } }
   </section>
-  }
 </ng-template>
