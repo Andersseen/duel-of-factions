@@ -1,8 +1,9 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "./out-tsc/app"
+    "outDir": "./out-tsc/app",
+    "importHelpers": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["tests", "node_modules"]
+  "exclude": ["tests", "node_modules", "src/server/**/*.ts"]
 }

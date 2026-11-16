@@ -1,0 +1,23 @@
+{
+  "packs": [
+    "technical",
+    "typescript",
+    "angular",
+    "ui-ux",
+    "accessibility",
+    "testing",
+    "efficiency",
+    "duel"
+  ],
+  "enable": ["playwright"],
+  "skillDirectories": [".agentyx/skills"],
+  "localPacks": [
+    {
+      "name": "duel",
+      "category": "workflow",
+      "description": "How this game dogfoods Volt UI, Quartz, Angular Movement, Lumen Icons and Strata.",
+      "skills": ["duel-library-integration"]
+    }
+  ],
+  "targets": ["claude", "codex"]
+}

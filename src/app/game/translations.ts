@@ -2,6 +2,16 @@ import { EN, ABILITY_EN } from "./i18n";
 export const T: Record<string, string[]> = {
   title: ["Duelo de Facciones", "Двобій фракцій"],
   play: ["Nueva partida", "Нова гра"],
+  codex: ["Códice", "Кодекс"],
+  codexSub: [
+    "Todas las cartas y facciones, con sus habilidades. Renderizado en el servidor.",
+    "Усі карти й фракції з їхніми здібностями. Відрендерено на сервері.",
+  ],
+  openCodex: ["Abrir el códice", "Відкрити кодекс"],
+  playFaction: ["Jugar con esta facción", "Грати за цю фракцію"],
+  neutralCards: ["Cartas neutrales", "Нейтральні карти"],
+  backToGame: ["Volver al juego", "Повернутися до гри"],
+  copies: ["copias", "копії"],
   help: ["Cómo jugar", "Як грати"],
   menu: ["Menú principal", "Головне меню"],
   back: ["Volver", "Назад"],

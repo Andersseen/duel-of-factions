@@ -1,0 +1,24 @@
+<svg
+  class="portrait-image"
+  [attr.viewBox]="atlas().viewBox"
+  [attr.preserveAspectRatio]="contain() ? 'xMidYMid meet' : 'xMidYMin slice'"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <clipPath [attr.id]="clip">
+      <rect
+        [attr.x]="atlas().x"
+        [attr.y]="atlas().y"
+        [attr.width]="atlas().cell - 4"
+        [attr.height]="atlas().cell - 4"
+      />
+    </clipPath>
+  </defs>
+  <image
+    [attr.href]="'/assets/' + atlas().file"
+    [attr.width]="atlas().width"
+    [attr.height]="atlas().height"
+    [attr.clip-path]="'url(#' + clip + ')'"
+  />
+</svg>

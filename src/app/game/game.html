@@ -48,6 +48,15 @@
           <lmn-settings [size]="16" /> {{ c.t("settings") }}
         </button>
       </div>
+      <!-- The codex is a Strata Server Component route: a real document navigation. -->
+      <a
+        class="codex-link"
+        voltButton
+        variant="link"
+        [strataDocumentLink]="['/codex']"
+        [queryParams]="{ lang: langCode() }"
+        ><lmn-book-open [size]="16" /> {{ c.t("openCodex") }}</a
+      >
       <div class="menu-notes">{{ c.t("local") }}</div>
     </div>
     @if (showMenuArt()) {

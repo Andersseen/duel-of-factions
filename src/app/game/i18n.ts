@@ -1,6 +1,14 @@
 export const EN: Record<string, string> = {
   title: "Duel of Factions",
   play: "New game",
+  codex: "Codex",
+  codexSub:
+    "Every card and faction, with its abilities. Rendered on the server.",
+  openCodex: "Open the codex",
+  playFaction: "Play this faction",
+  neutralCards: "Neutral cards",
+  backToGame: "Back to the game",
+  copies: "copies",
   help: "How to play",
   menu: "Main menu",
   back: "Back",

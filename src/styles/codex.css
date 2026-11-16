@@ -1,0 +1,183 @@
+/*
+ * Card codex (/codex): a server-rendered document, so unlike the game screens it scrolls.
+ * Cards reuse styles/card.css; Volt atoms keep their own look.
+ */
+html:has(.codex),
+body:has(.codex),
+:has(> .codex) {
+  height: auto;
+  overflow: visible;
+}
+.codex {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 4vw 64px;
+}
+.codex-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--gold);
+  text-decoration: none;
+}
+.codex-back:hover {
+  text-decoration: underline;
+}
+.codex-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  padding-right: 52px;
+}
+.codex-header h1 {
+  margin: 6px 0 10px;
+  font-size: clamp(40px, 6vw, 72px);
+}
+.codex-header p {
+  max-width: 520px;
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+.codex-index {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  gap: 18px;
+  margin: 28px 0 8px;
+  padding: 12px 0;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in oklab, var(--bg) 92%, transparent);
+  backdrop-filter: blur(6px);
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+.codex-index a {
+  font-size: 13px;
+  color: var(--ink-muted);
+  text-decoration: none;
+}
+.codex-index a:hover,
+.codex-index a:focus-visible {
+  color: var(--gold);
+}
+
+.codex-faction {
+  padding-top: 32px;
+  scroll-margin-top: 56px;
+}
+.codex-faction > h2 {
+  margin-bottom: 16px;
+}
+.codex-faction-head {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+  padding: 18px;
+  border-color: var(--line);
+  background: linear-gradient(
+    120deg,
+    rgba(var(--realm-rgb), 0.4),
+    color-mix(in oklab, var(--bg) 85%, black)
+  );
+}
+.codex-leader {
+  display: block;
+  width: 120px;
+  aspect-ratio: 1;
+  border: 1px solid #9d8b56;
+  border-radius: 10px;
+}
+.codex-faction-copy h2 {
+  margin: 4px 0 8px;
+}
+.codex-faction-copy p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #c2c5b4;
+}
+.codex-leader-ability {
+  margin-top: 6px;
+}
+.codex-leader-ability strong {
+  color: var(--gold);
+}
+.codex-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.codex-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+  list-style: none;
+}
+.codex-entry {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--panel) 75%, transparent);
+}
+.codex-entry > .game-card {
+  cursor: default;
+}
+.codex-entry h3 {
+  font-size: 20px;
+}
+.codex-entry p {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+.codex-entry p strong {
+  color: var(--ink);
+}
+.codex-meta {
+  color: var(--gold) !important;
+}
+
+/* Menu link into the codex. */
+.codex-link {
+  gap: 6px;
+  padding-left: 0;
+  margin: -12px 0 14px;
+}
+
+@media (max-width: 700px) {
+  .codex {
+    padding: 18px 14px 48px;
+  }
+  .codex-header {
+    padding-right: 44px;
+  }
+  .codex-faction-head {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+  .codex-leader {
+    width: 72px;
+  }
+  .codex-faction-head > duel-codex-play {
+    grid-column: 1 / -1;
+  }
+  .codex-cards {
+    grid-template-columns: 1fr;
+  }
+  .codex-link {
+    margin: -6px auto 10px;
+  }
+}

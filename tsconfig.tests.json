@@ -5,5 +5,8 @@
     "src/app/game/engine.ts",
     "src/app/game/i18n.ts",
     "src/app/game/models.ts"
+  ],
+  "exclude": [
+    "tests/api.test.ts"
   ]
 }

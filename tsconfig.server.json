@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "experimentalDecorators": false,
+    "useDefineForClassFields": true,
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "src/server/**/*.ts",
+    "tests/api.test.ts"
+  ]
+}
