@@ -134,15 +134,37 @@ npx agentyx install     # after changing .agentyx.json or a project skill
 
 ## Build and deploy
 
+The site is deployed to **Cloudflare Pages** with Nitro's `cloudflare-pages` preset: static assets plus a `_worker.js` that server-renders `/codex` and serves `/api`. This is the runtime Strata qualifies, and `wrangler.jsonc` is the source of truth for the project (output directory, compatibility date `2026-09-21`, `nodejs_compat`).
+
 ```sh
-npm run build
-npm run preview         # node dist/analog/server/index.mjs (PORT=3000 by default)
+npm run build:cloudflare      # BUILD_PRESET=cloudflare-pages vite build → dist/analog/public
+npm run preview:cloudflare    # the same build on local workerd (wrangler pages dev, :8788)
+npm run deploy:cloudflare     # manual deploy: typecheck, tests, build, wrangler pages deploy
 ```
 
-The build produces a Nitro `node-server` app in `dist/analog`: static assets in `dist/analog/public` and the server in `dist/analog/server`. Deploy it to any Node 22+ host. For Cloudflare Pages, build with `BUILD_PRESET=cloudflare-pages npm run build` (the preset Strata qualifies; not exercised in this repository yet). The game itself has no server dependency; the server is needed for `/codex` and `/api`.
+`public/_routes.json` excludes `/assets/*` from the worker, so images and bundles are served as static files. Nitro writes its own `_routes.json` one level above Analog's public directory, where Pages never sees it.
+
+For a plain Node host, `npm run build` and `npm run preview` produce and run a Nitro `node-server` in `dist/analog`.
+
+### Continuous deployment (GitHub Actions)
+
+`.github/workflows/ci.yml`:
+
+| Job          | When                                         | What                                                                                                                                              |
+| ------------ | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `verify`     | every push and pull request                  | `npm ci`, typecheck, tests, Cloudflare build, output checks (worker, routes, no server-only code in browser assets), uploads the `pages` artifact |
+| `preview`    | pull requests from this repository           | deploys that artifact as a Pages preview for the branch; the URL shows on the pull request                                                        |
+| `production` | pushes to `main` (or a manual run on `main`) | deploys the same artifact to production, one deployment at a time, then smoke-tests `/`, `/codex` and `/api/health`                               |
+
+The Pages project is created on the first deployment. One-time setup in GitHub (Settings → Secrets and variables → Actions):
+
+- `CLOUDFLARE_API_TOKEN`: an API token with **Account · Cloudflare Pages · Edit**.
+- `CLOUDFLARE_ACCOUNT_ID`: your account id (Cloudflare dashboard → Workers & Pages → Account details).
+
+Wrangler is pinned in `package.json`; the workflow reads that version, so local and CI deployments use the same one.
 
 ## Notes
 
 - Match state exists only in memory and resets when the page reloads. Decks and preferences are saved in local storage on the current browser.
-- `.npmrc` sets `legacy-peer-deps=true` because Quartz Headless and Lumen Icons still declare `@angular/core ^21` as their peer range. The flag also hides _missing_ peers, so required peers are listed explicitly in `package.json` (`@angular/forms` for Volt/ng-primitives, `front-matter` for `@analogjs/content`). Remove the flag once those peer ranges include Angular 22.
+- `.npmrc` sets `legacy-peer-deps=true` because Quartz Headless and Lumen Icons still declare `@angular/core ^21` as their peer range. The flag also hides _missing_ peers, so required peers are listed explicitly in `package.json` (`@angular/forms` for Volt/ng-primitives; `front-matter`, `marked`, `marked-gfm-heading-id` and `marked-mangle` for `@analogjs/content`, which the Cloudflare worker bundle must resolve). Remove the flag once those peer ranges include Angular 22.
 - The game uses Angular, Analog, Tailwind CSS, Volt UI, Quartz Headless, Angular Movement and Lumen Icons. See `package.json` for the complete dependency list.

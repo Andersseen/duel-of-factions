@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Cloudflare Pages project. The build (`npm run build:cloudflare`, Nitro's `cloudflare-pages`
+  // preset) writes the static assets and `_worker.js` (SSR for /codex, the /api controllers).
+  "name": "duel-of-factions",
+  "pages_build_output_dir": "./dist/analog/public",
+  // The compatibility date Strata qualifies its Cloudflare Pages runtime against.
+  "compatibility_date": "2026-09-21",
+  "compatibility_flags": ["nodejs_compat"],
+}

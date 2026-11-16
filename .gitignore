@@ -6,3 +6,4 @@ out-tsc/
 .env*
 .DS_Store
 src/generated/
+.wrangler/
