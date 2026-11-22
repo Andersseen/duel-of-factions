@@ -66,7 +66,7 @@ src/server/
 src/main.server.ts       SSR entry, wrapped in Strata's SSR failure contract
 src/styles.css           Imports Tailwind, the Volt theme preset and the partials below
 src/styles/              tokens, base, card, menu, faction, deck, prepare, battle, dialogs, result, codex
-public/assets/           Faction and card artwork
+public/art/              Faction and card artwork (WebP sprite sheets)
 tests/                   Engine, game-store and API tests
 .agentyx/skills/         Project skill for coding agents (installed by Agentyx)
 ```
@@ -142,7 +142,7 @@ npm run preview:cloudflare    # the same build on local workerd (wrangler pages 
 npm run deploy:cloudflare     # manual deploy: typecheck, tests, build, wrangler pages deploy
 ```
 
-`public/_routes.json` excludes `/assets/*` from the worker, so images and bundles are served as static files. Nitro writes its own `_routes.json` one level above Analog's public directory, where Pages never sees it.
+`public/_routes.json` excludes `/assets/*` and `/art/*` from the worker, so bundles and images are served as static files; `public/_headers` caches hashed bundles forever and the artwork for a day (revalidated in the background). Nitro writes its own `_routes.json` one level above Analog's public directory, where Pages never sees it.
 
 For a plain Node host, `npm run build` and `npm run preview` produce and run a Nitro `node-server` in `dist/analog`.
 

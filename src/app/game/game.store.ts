@@ -68,8 +68,7 @@ export function createGameController(viewport?: ViewportSize) {
     modal: Modal = null,
     roundNotice: [number, number] | null = null,
     aiTimer: ReturnType<typeof setTimeout> | null = null;
-  let preparePage = 0,
-    handPage = 0,
+  let handPage = 0,
     factionPage = 0;
   let difficulty = read("df-difficulty", "normal");
   if (!E.DIFFICULTIES.includes(difficulty)) difficulty = "normal";
@@ -113,7 +112,6 @@ export function createGameController(viewport?: ViewportSize) {
       difficulty,
     );
     handPage = 0;
-    preparePage = 0;
     selected = null;
     hover = null;
     swaps = 0;
@@ -196,12 +194,6 @@ export function createGameController(viewport?: ViewportSize) {
         break;
       case "prepare-help":
         modal = "prepare-help";
-        break;
-      case "prepare-prev":
-        preparePage = Math.max(0, preparePage - 1);
-        break;
-      case "prepare-next":
-        preparePage++;
         break;
       case "swap-preview":
         modal = { type: "swap-preview", uid };
@@ -387,10 +379,15 @@ export function createGameController(viewport?: ViewportSize) {
     render();
   }
 
+  /** Phones scroll the whole hand sideways (swipe); wider screens page it. */
+  function handPageSize() {
+    const all = Math.max(1, game?.players[0].hand.length ?? 0);
+    return vp.width() < 700 ? all : vp.width() < 1000 ? 6 : 10;
+  }
+
   function resize() {
     ownViewport?.width.set(window.innerWidth);
     ownViewport?.height.set(window.innerHeight);
-    preparePage = 0;
     handPage = 0;
     factionPage = 0;
     render();
@@ -580,35 +577,20 @@ export function createGameController(viewport?: ViewportSize) {
       revision();
       return factionPage;
     },
+    /** Short wide screens page the factions two by two; phones scroll all four. */
     get factionPages() {
       revision();
-      return vp.width() < 700 || vp.height() < 650 ? 2 : 1;
+      return vp.width() >= 700 && vp.height() < 650 ? 2 : 1;
     },
     get factions() {
       revision();
-      const size = vp.width() < 700 || vp.height() < 650 ? 2 : 4;
+      const size = vp.width() >= 700 && vp.height() < 650 ? 2 : 4;
       return E.FACTIONS.slice(factionPage * size, (factionPage + 1) * size);
     },
-    get preparePage() {
-      revision();
-      return preparePage;
-    },
-    get preparePages() {
-      revision();
-      return Math.ceil(
-        (game?.players[0].hand.length ?? 1) /
-          (vp.width() < 360 ? 2 : vp.width() < 700 ? 3 : 10),
-      );
-    },
+    /** The whole opening hand: a 5 × 2 grid on desktop, a compact grid on phones. */
     get startingHand() {
       revision();
-      const size = vp.width() < 360 ? 2 : vp.width() < 700 ? 3 : 10;
-      return (
-        game?.players[0].hand.slice(
-          preparePage * size,
-          (preparePage + 1) * size,
-        ) ?? []
-      );
+      return game?.players[0].hand ?? [];
     },
     get handPage() {
       revision();
@@ -618,15 +600,12 @@ export function createGameController(viewport?: ViewportSize) {
       revision();
       return Math.max(
         1,
-        Math.ceil(
-          (game?.players[0].hand.length ?? 0) /
-            (vp.width() < 650 ? 3 : vp.width() < 1000 ? 6 : 10),
-        ),
+        Math.ceil((game?.players[0].hand.length ?? 0) / handPageSize()),
       );
     },
     get hand() {
       revision();
-      const size = vp.width() < 650 ? 3 : vp.width() < 1000 ? 6 : 10;
+      const size = handPageSize();
       handPage = Math.min(
         handPage,
         Math.max(0, Math.ceil((game?.players[0].hand.length ?? 0) / size) - 1),
