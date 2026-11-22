@@ -3,9 +3,9 @@
 # Any failure other than "already exists" (bad token, missing account id…) fails the job.
 set -uo pipefail
 
-: "${PAGES_PROJECT:?}" "${WRANGLER_VERSION:?}" "${CLOUDFLARE_API_TOKEN:?missing secret}" "${CLOUDFLARE_ACCOUNT_ID:?missing secret}"
+: "${PAGES_PROJECT:?}" "${CLOUDFLARE_API_TOKEN:?missing secret}" "${CLOUDFLARE_ACCOUNT_ID:?missing secret}"
 
-output="$(npx --yes "wrangler@${WRANGLER_VERSION}" pages project create "$PAGES_PROJECT" \
+output="$(npx --no-install wrangler pages project create "$PAGES_PROJECT" \
   --production-branch=main \
   --compatibility-date=2026-09-21 \
   --compatibility-flags=nodejs_compat 2>&1)"

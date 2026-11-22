@@ -106,6 +106,16 @@ jobs:
           name: pages
           path: ${{ env.PAGES_OUTPUT }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # Installs the Wrangler pinned in package-lock.json, which the deploy steps below use.
+      - name: Install dependencies
+        run: npm ci
+
       - name: Ensure the Pages project exists
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -158,6 +168,16 @@ jobs:
           name: pages
           path: ${{ env.PAGES_OUTPUT }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # Installs the Wrangler pinned in package-lock.json, which the deploy steps below use.
+      - name: Install dependencies
+        run: npm ci
+
       - name: Ensure the Pages project exists
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -181,7 +201,8 @@ jobs:
           URL: ${{ steps.deploy.outputs.deployment-url }}
         run: |
           for path in / /codex /api/health; do
-            status="$(curl -s -o /dev/null -w '%{http_code}' --retry 5 --retry-delay 3 --retry-all-errors "$URL$path")"
+            # A new deployment's TLS certificate can take a minute or two to be served (curl exit 35).
+            status="$(curl -sS -o /dev/null -w '%{http_code}' --retry 20 --retry-delay 6 --retry-all-errors "$URL$path")"
             echo "$path -> $status"
             test "$status" = 200
           done
