@@ -182,12 +182,7 @@
         ><span [gamePortrait]="c.E.LEADER_ART[game.players[1].f]"></span
       ></volt-avatar>
     </div>
-    <div
-      class="starting-hand"
-      [style.--shown]="c.startingHand.length"
-      moveStagger
-      moveStaggerStep="60ms"
-    >
+    <div class="starting-hand" moveStagger moveStaggerStep="60ms">
       @for (card of c.startingHand; track card.uid) {
       <div
         class="starting-card"
@@ -208,33 +203,6 @@
       </div>
       }
     </div>
-    @if (c.preparePages > 1) {
-    <div class="pager prepare-pagination">
-      <button
-        voltButton
-        size="icon"
-        variant="outline"
-        (click)="act('prepare-prev')"
-        [disabled]="c.preparePage === 0"
-        [attr.aria-label]="c.t('previousCards')"
-        [qzTooltip]="c.t('previousCards')"
-      >
-        <lmn-chevron-left [size]="16" />
-      </button>
-      <span>{{ c.preparePage + 1 }} / {{ c.preparePages }}</span>
-      <button
-        voltButton
-        size="icon"
-        variant="outline"
-        (click)="act('prepare-next')"
-        [disabled]="c.preparePage === c.preparePages - 1"
-        [attr.aria-label]="c.t('nextCards')"
-        [qzTooltip]="c.t('nextCards')"
-      >
-        <lmn-chevron-right [size]="16" />
-      </button>
-    </div>
-    }
     <footer class="prepare-footer">
       <span class="exchanges"
         ><lmn-arrow-path [size]="14" /> {{ c.t("exchanges") }}:

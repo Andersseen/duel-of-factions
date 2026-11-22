@@ -40,7 +40,10 @@ import { BattlefieldComponent } from "./components/battlefield.component";
 import { CardComponent } from "./components/card.component";
 import { DeckBuilderComponent } from "./components/deck-builder.component";
 import { OverlayComponent } from "./components/overlay.component";
-import { PortraitComponent } from "./components/portrait.component";
+import {
+  PortraitComponent,
+  warmPortraitSheets,
+} from "./components/portrait.component";
 import { isFaction, isLang, langIndex, LANGS } from "./catalog";
 import { GameStore } from "./game.store";
 import { BumpDirective } from "./motion/bump.directive";
@@ -102,6 +105,7 @@ export class GameComponent {
 
   constructor() {
     this.#applyDeepLink();
+    warmPortraitSheets();
   }
 
   /** Language code for links that leave the game (the store keeps an index). */

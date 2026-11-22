@@ -35,14 +35,10 @@ try {
   c.action("prepare");
   assert.equal(c.game?.difficulty, "hard");
   assert.equal(c.startingHand.length, 10);
-  assert.equal(c.preparePages, 1);
+  // Phones show the whole opening hand too (no paging).
   setViewport(308, 741);
-  assert.equal(c.startingHand.length, 2);
-  assert.equal(c.preparePages, 5);
-  c.action("prepare-next");
-  assert.equal(c.preparePage, 1);
+  assert.equal(c.startingHand.length, 10);
   setViewport(1366, 936);
-  assert.equal(c.preparePage, 0);
   assert.equal(c.startingHand.length, 10);
   const old = c.startingHand[0];
   c.action("swap-preview", { uid: String(old.uid) });
@@ -64,6 +60,11 @@ try {
   c.action("close");
   c.action("begin");
   assert.equal(c.screen, "battle");
+  // Phones get the whole hand in one swipeable strip; desktops page it.
+  setViewport(390, 844);
+  assert.equal(c.hand.length, c.game!.players[0].hand.length);
+  assert.equal(c.handPages, 1);
+  setViewport(1366, 936);
   const unit = c.hand.find((card) => c.E.def(card).unit)!;
   assert.equal(c.selectDrag(-1), false);
   assert.equal(c.selected, null);

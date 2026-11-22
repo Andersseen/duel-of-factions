@@ -661,13 +661,42 @@
     padding: 0 4px;
     font-size: 10px;
   }
+  /* The whole hand in one strip: swipe sideways to browse, tap to select, long-press to drag.
+     The padding leaves room for the selected card's lift and outline inside the scroller. */
   .hand {
+    justify-content: flex-start;
     gap: 6px;
-    padding: 3px 4px;
+    padding: 11px 12px 3px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 12px;
+    scrollbar-width: none;
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 12px,
+      #000 calc(100% - 12px),
+      transparent
+    );
+  }
+  .hand::-webkit-scrollbar {
+    display: none;
   }
   .hand > .game-card {
-    flex: 1 1 0;
-    max-width: 116px;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: none;
+    scroll-snap-align: start;
+    touch-action: pan-x;
+  }
+  /* Centred while the hand fits, scrollable from its first card once it does not. */
+  .hand > .game-card:first-child {
+    margin-left: auto;
+  }
+  .hand > .game-card:last-child {
+    margin-right: auto;
   }
   .action-dock {
     flex-wrap: wrap;
